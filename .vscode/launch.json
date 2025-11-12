@@ -1,0 +1,55 @@
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "name": "jjewellery (prodnormal)",
+//       "request": "launch",
+//       "type": "dart",
+//       "program": "lib/main_normal.dart",
+//       "args": ["--flavor", "prodnormal"]
+//     },
+//     {
+//       "name": "jjewellery (prodsang)",
+//       "request": "launch",
+//       "type": "dart",
+//       "program": "lib/main_normal.dart",
+//       "args": ["--flavor", "prodsang"]
+//     },
+//     {
+//       "name": "jjewellery (release - prodnormal)",
+//       "request": "launch",
+//       "type": "dart",
+//       "flutterMode": "release",
+//       "program": "lib/main_normal.dart",
+//       "args": ["--flavor", "prodnormal"]
+//     }
+//   ]
+// }
+
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "jjewellery (prodsang)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_sang.dart",
+      "args": ["--flavor", "prodsang"]
+    },
+    {
+      "name": "jjewellery (prodsang)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_normal.dart",
+      "args": ["--flavor", "prodsang"]
+    },
+    {
+      "name": "jjewellery (release - prodnormal)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main_normal.dart",
+      "args": ["--flavor", "prodnormal"]
+    }
+  ]
+}

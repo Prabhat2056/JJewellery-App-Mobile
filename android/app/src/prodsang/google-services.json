@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "187113102043",
+    "project_id": "jjewellery-20a2b",
+    "storage_bucket": "jjewellery-20a2b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187113102043:android:7d4c5937098f1178facafe",
+        "android_client_info": {
+          "package_name": "com.example.sunpatra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC--bgGObXRxVXr6x5aQ--P2Ec7Knbt9NQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187113102043:android:fe6b964c01ddb413facafe",
+        "android_client_info": {
+          "package_name": "com.example.sunpatra.prodnormal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC--bgGObXRxVXr6x5aQ--P2Ec7Knbt9NQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187113102043:android:2b564fdd76900536facafe",
+        "android_client_info": {
+          "package_name": "com.example.sunpatra.prodsang"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC--bgGObXRxVXr6x5aQ--P2Ec7Knbt9NQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
