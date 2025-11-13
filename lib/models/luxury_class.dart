@@ -1,15 +1,13 @@
-class Luxury {
-  final String id;
-  final String title;
-  final double amount;
-  final String? description;
-  final DateTime date;
+// class Luxury {
+//   late final String luxury;           //luxury field
+//   late String luxuryPercentage;  //luxuryPercentage field
 
-  Luxury({
-    required this.id,
-    required this.title,
-    required this.amount,
-    this.description,
-    required this.date,
-  });
-}
+
+//   Luxury({
+//     required this.luxury,
+//     required this.luxuryPercentage,
+
+    
+//   });
+
+// }

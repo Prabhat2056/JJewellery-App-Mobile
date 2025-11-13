@@ -30,6 +30,13 @@ class QrDataModel {
   int stone3Id;
   String stone3Weight;
   String stone3Price;
+  double baseAmount;
+double nonTaxableAmount;
+double taxableAmount;
+double luxuryAmount;
+double total; // total
+String expectedAmount = "";
+
 
   QrDataModel({
     required this.id,
@@ -63,6 +70,12 @@ class QrDataModel {
     required this.stone3Id,
     required this.stone3Weight,
     required this.stone3Price,
+    required this.baseAmount ,
+    required this.nonTaxableAmount ,
+    required this.taxableAmount ,
+    required this.luxuryAmount ,
+    required this.total ,
+    required this.expectedAmount ,
   });
 
   Map<String, dynamic> toJson() => {
@@ -76,6 +89,13 @@ class QrDataModel {
         'jartiQty': jarti,
         'jartiPercent': jartiPercentage,
         'jyalaAmount': jyala.replaceAll(',', '').trim(),
+        //'luxuryPercent': luxuryPercentage,//
+        'luxuryAmount': luxuryAmount.toStringAsFixed(2),
+        'baseAmount': baseAmount.toStringAsFixed(2),
+        'nonTaxableAmount': nonTaxableAmount.toStringAsFixed(2),
+        'taxableAmount': taxableAmount.toStringAsFixed(2),
+        'totalAmount': total.toStringAsFixed(2),
+        'expectedAmount': expectedAmount.replaceAll(',', '').trim(),
         'stone1Id': stone1Id,
         'stone1Qty': stone1Id == 0
             ? 0

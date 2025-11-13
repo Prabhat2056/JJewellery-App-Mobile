@@ -57,6 +57,9 @@ class QrResultItemChangedEvent extends QrResultEvent {
   });
 }
 
+
+
+
 class QrResultOnLoadingEvent extends QrResultEvent {
   final bool isLoading;
 

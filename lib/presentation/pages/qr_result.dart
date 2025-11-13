@@ -9,11 +9,16 @@ import 'package:jjewellery/models/qr_data_model.dart';
 
 import 'package:jjewellery/presentation/pages/bill_page.dart';
 import 'package:jjewellery/presentation/pages/login_page.dart';
+import 'package:jjewellery/presentation/pages/luxury.dart';
+
 
 import 'package:jjewellery/presentation/widgets/Global/custom_toast.dart';
 import 'package:jjewellery/presentation/widgets/Global/refresh_indicator.dart';
+import 'package:jjewellery/presentation/widgets/QrResult/expected_amount.dart';
+
 import 'package:jjewellery/presentation/widgets/QrResult/qr_result_header.dart';
 import 'package:jjewellery/presentation/widgets/QrResult/qr_result_stone_table.dart';
+
 
 import 'package:jjewellery/presentation/widgets/QrResult/row_with_textfield.dart';
 import 'package:jjewellery/presentation/widgets/QrResult/show_item_picker.dart';
@@ -66,6 +71,7 @@ class _QrResultState extends State<QrResult> {
   TextEditingController stone1PriceController = TextEditingController();
   TextEditingController stone2PriceController = TextEditingController();
   TextEditingController stone3PriceController = TextEditingController();
+  TextEditingController expectedAmountController = TextEditingController();
   late QrDataModel originalQrData;
   @override
   void initState() {
@@ -150,6 +156,7 @@ class _QrResultState extends State<QrResult> {
             stone1PriceController.text = state.qrData.stone1Price;
             stone2PriceController.text = state.qrData.stone2Price;
             stone3PriceController.text = state.qrData.stone3Price;
+            expectedAmountController.text = state.qrData.expectedAmount;
             return GestureDetector(
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               child: Scaffold(
@@ -459,46 +466,52 @@ class _QrResultState extends State<QrResult> {
                             ),
 
                             const Divider(),
+                            ExpectedAmount(
+                              controller: expectedAmountController, 
+                              totalAmount: state.qrData.total, 
+                              jyala: double.tryParse(state.qrData.jyala) ?? 0.0,),
+                              
+                            
+                            const Divider(),
+
+                            const Divider(),
                             BlocBuilder<QrResultBloc, QrResultState>(
                               buildWhen: (previous, current) =>
                                   current is QrResultPriceChangedState ||
                                   current is QrResultInitialState,
                               builder: (context, state) {
                                 if (state is QrResultPriceChangedState) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 0, vertical: 6),
-                                    child: Text(
-                                      "Total : Rs ${state.qrData.price}",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
+                                  final qr = state.qrData;
+
+                                  return LuxuryCalculationPage(
+                                    baseAmount: qr.baseAmount,
+                                    nonTaxableAmount: qr.nonTaxableAmount,
+                                    taxableAmount: qr.taxableAmount,
+                                    luxuryAmount: qr.luxuryAmount,
+                                    total: qr.total,
+                                    qrData: state.qrData,
                                   );
                                 } else if (state is QrResultInitialState) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 0, vertical: 6),
-                                    child: Text(
-                                      "Total : Rs ${state.qrData.price}",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
+                                  final qr = state.qrData;
+
+                                  return LuxuryCalculationPage(
+                                    baseAmount: qr.baseAmount,
+                                    nonTaxableAmount: qr.nonTaxableAmount,
+                                    taxableAmount: qr.taxableAmount,
+                                    luxuryAmount: qr.luxuryAmount,
+                                    total: qr.total,
+                                    qrData: state.qrData,
                                   );
                                 } else {
-                                  return Center(
-                                    child: CircularProgressIndicator(),
-                                  );
+                                  return const Center(
+                                      child: CircularProgressIndicator());
                                 }
                               },
                             ),
 
 
 
-                             const Divider(),
+                            const Divider(),
                             const SizedBox(
                               height: 4,
                             ),

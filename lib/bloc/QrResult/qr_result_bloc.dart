@@ -110,6 +110,59 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
         .toStringAsFixed(3);
   }
 
+  //---------------------------------------luxury calculation-----------------------------------------------------------
+
+  void calcLuxury(qrData) {
+    double luxuryPercentage = double.tryParse(qrData.luxuryPercentage) ?? 0;
+
+    qrData.luxuryAmount =
+        ((double.parse(qrData.netWeight) + double.parse(qrData.jarti)) *
+                (luxuryPercentage / 100) *
+                (stringToDouble(qrData.rate) / 11.664))
+            .toStringAsFixed(3);
+  }
+
+void calcLuxuryCalculations(qrData) {
+    double stone1Price = stringToDouble(qrData.stone1Price ?? "0.000");
+   double stone2Price = stringToDouble(qrData.stone2Price ?? "0.000");
+    double stone3Price = stringToDouble(qrData.stone3Price ?? "0.000");
+   double netWeight = qrData.netWeight.trim().isEmpty ? 0 : double.parse(qrData.netWeight);
+   double jartiGram = qrData.jarti.trim().isEmpty ? 0 : double.parse(qrData.jarti);
+    double rate = stringToDouble(qrData.rate);
+    double jyala = stringToDouble(qrData.jyala);
+
+    // if (rate == 0) {
+    //   qrData.baseAmount = 0;
+    //   qrData.nonTaxableAmount = 0;
+    //   qrData.taxableAmount = 0;
+    //   qrData.luxuryAmount = 0;
+    //   qrData.total = 0;
+    //   return;
+    // }
+    // else if (jyala < 0) {
+    //   jyala = 0;
+    // }
+
+
+   double nonTaxableAmount = stone1Price + stone2Price + stone3Price;
+    double baseAmount = qrData.jarti.trim().isEmpty
+       ? (netWeight * (rate / 11.664)) + jyala + nonTaxableAmount
+       : ((netWeight + jartiGram) * (rate / 11.664)) + jyala + nonTaxableAmount;
+
+   double taxableAmount = baseAmount - nonTaxableAmount;
+   if (taxableAmount < 0) taxableAmount = 0;
+    double luxuryAmount = taxableAmount * 0.02;
+  double total = baseAmount + luxuryAmount;
+
+    qrData.baseAmount = baseAmount;
+    qrData.nonTaxableAmount = nonTaxableAmount;
+   qrData.taxableAmount = taxableAmount;
+    qrData.luxuryAmount = luxuryAmount;
+    qrData.total = total;
+  }
+  
+   //--------------------------------------------------------------------------------------------------
+
   void calcRate(qrData, karatSettings) {
     var karat = karatSettings.where((karat) => karat["karat"] == qrData.purity);
 
@@ -147,6 +200,8 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
     }
   }
 
+  
+
   void calcPrice(qrData) {
     late double netWeight;
     if (qrData.netWeight.trim().isEmpty) {
@@ -161,6 +216,7 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
               stringToDouble(qrData.stone1Price ?? "0.000") +
               stringToDouble(qrData.stone2Price ?? "0.000") +
               stringToDouble(qrData.stone3Price ?? "0.000"));
+    
       return;
     }
     if (qrData.netWeight.isEmpty) {
@@ -170,6 +226,7 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
           stringToDouble(qrData.stone1Price ?? "0.000") +
           stringToDouble(qrData.stone2Price ?? "0.000") +
           stringToDouble(qrData.stone3Price ?? "0.000"));
+      
       return;
     }
 
@@ -180,6 +237,7 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
             stringToDouble(qrData.stone1Price ?? "0.000") +
             stringToDouble(qrData.stone2Price ?? "0.000") +
             stringToDouble(qrData.stone3Price ?? "0.000"));
+    
   }
 
   QrResultBloc() : super(QrResultInitial()) {
@@ -190,6 +248,7 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
       calcRate(event.qrData, karatSettings);
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
+      calcLuxuryCalculations(event.qrData);//
 
       emit(
         QrResultInitialState(
@@ -227,6 +286,12 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
             stone3Id: event.qrData.stone3Id,
             stone3Weight: event.qrData.stone3Weight,
             stone3Price: event.qrData.stone3Price,
+            baseAmount: event.qrData.baseAmount,
+            nonTaxableAmount: event.qrData.nonTaxableAmount,
+            taxableAmount: event.qrData.taxableAmount,
+            luxuryAmount: event.qrData.luxuryAmount,
+            total: event.qrData.total,
+            expectedAmount: event.qrData.expectedAmount,
           ),
         ),
       );
@@ -234,23 +299,29 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
     on<QrResultJyalaChangedEvent>((event, emit) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
+     calcLuxuryCalculations(event.qrData);
+
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJyalaPercentageChangedEvent>((event, emit) {
       calcJyala(event.qrData);
       calcPrice(event.qrData);
+      calcLuxuryCalculations(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultNetWeightChangedEvent>((event, emit) {
       calcJartiPercentage(event.qrData);
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
+      calcLuxuryCalculations(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultRateChangedEvent>((event, emit) {
       // calcJyala(event.qrData);
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
+      calcLuxuryCalculations(event.qrData);
+
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJartiGramChangedEvent>((event, emit) {
@@ -258,6 +329,7 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
       calcJartiLal(event.qrData);
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
+      calcLuxuryCalculations(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJartiLalChangedEvent>((event, emit) {
@@ -271,6 +343,7 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
       calcJartiPercentage(event.qrData);
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
+      calcLuxuryCalculations(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJartiPercentageChangedEvent>((event, emit) {
@@ -278,8 +351,11 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
       calcJartiLal(event.qrData);
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
+      calcLuxuryCalculations(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
+
+    
 
     on<QrResultItemChangedEvent>(
       (event, emit) {

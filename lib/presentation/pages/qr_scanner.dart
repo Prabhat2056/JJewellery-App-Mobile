@@ -137,6 +137,14 @@ class _QrScannerState extends State<QrScanner> {
         rate: "",
         price: "",
         todayRate: "",
+
+        // Calculated fields set to 0; will be computed later
+        baseAmount: 0,
+        nonTaxableAmount: 0,
+        taxableAmount: 0,
+        luxuryAmount: 0,
+        total: 0,
+        expectedAmount: "",
       );
     } catch (e) {
       falseQr = true;

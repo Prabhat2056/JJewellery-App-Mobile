@@ -110,11 +110,19 @@ class _DiscountCardState extends State<DiscountCard> {
                     t3: widget.qrData.stone3Price,
                     width: width,
                   ),
-                  Divider(),
+                   Divider(color: const Color.fromARGB(255, 156, 69, 62),),
+                  _buildDiscountRow(
+                    t1: "Luxury Tax",
+                    t2: widget.originalQrData.luxuryAmount.toStringAsFixed(2),
+                    t3: widget.qrData.luxuryAmount.toStringAsFixed(2),
+                    width: width,
+                  ),
+                  Divider(color: const Color.fromARGB(255, 156, 69, 62),),
+                  
                   _buildDiscountRow(
                       t1: "Total",
-                      t2: widget.originalQrData.price,
-                      t3: widget.qrData.price,
+                      t2: widget.originalQrData.total.toStringAsFixed(2),
+                      t3: widget.qrData.total.toStringAsFixed(2),
                       width: width,
                       isTitle: true),
                 ],

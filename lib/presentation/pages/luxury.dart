@@ -1,114 +1,66 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/QrResult/qr_result_bloc.dart';
 
-class LuxuryCalculationPage extends StatefulWidget {
-  const LuxuryCalculationPage({super.key});
+
+
+
+
+
+import 'package:flutter/material.dart';
+import 'package:jjewellery/models/qr_data_model.dart';
+
+class LuxuryCalculationPage extends StatelessWidget {
+  final double baseAmount;
+  final double nonTaxableAmount;
+  final double taxableAmount;
+  final double luxuryAmount;
+  final double total;
+  final QrDataModel qrData;
+
+  const LuxuryCalculationPage({
+    super.key,
+    required this.baseAmount,
+    required this.nonTaxableAmount,
+    required this.taxableAmount,
+    required this.luxuryAmount,
+    required this.total,
+    required this.qrData,
+  });
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LuxuryCalculationPageState createState() => _LuxuryCalculationPageState();
-}
-
-class _LuxuryCalculationPageState extends State<LuxuryCalculationPage> {
-
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Luxury Calculation'),
+    final labelStyle = const TextStyle(fontSize: 14, fontWeight: FontWeight.w500);
+    final valueStyle = const TextStyle(fontSize: 15, fontWeight: FontWeight.w600);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildRow("Base Amount", baseAmount, labelStyle, valueStyle),
+          _buildRow("Non-Taxable Amount", nonTaxableAmount, labelStyle, valueStyle),
+          _buildRow("Taxable Amount", taxableAmount, labelStyle, valueStyle),
+          _buildRow("Luxury Amount (2%)", luxuryAmount, labelStyle, valueStyle),
+          const Divider(thickness: 1.2),
+          _buildRow(
+            "Total",
+            total,
+            labelStyle.copyWith(fontSize: 15, fontWeight: FontWeight.bold),
+            valueStyle.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
-      body: BlocBuilder<QrResultBloc, QrResultState>(
-        buildWhen: (previous, current) =>
-            current is QrResultPriceChangedState ||
-            current is QrResultInitialState,
-        builder: (context, state) {
-          if (state is QrResultPriceChangedState ||
-              state is QrResultInitialState) {
-            final qrData = (state is QrResultPriceChangedState)
-                ? state.qrData
-                : (state as QrResultInitialState).qrData;
+    );
+  }
 
-            // Parse values safely, removing commas as done in bloc's stringToDouble
-            double netWeight = double.tryParse(qrData.netWeight) ?? 0.0;
-            double jartiGram = double.tryParse(qrData.jarti) ?? 0.0;
-            double rate = double.tryParse(qrData.rate) ?? 0.0;
-            double jyala = double.tryParse(qrData.jyala) ?? 0.0;
-
-            double stone1Price = double.tryParse(qrData.stone1Price) ?? 0.0;
-            double stone2Price = double.tryParse(qrData.stone2Price) ?? 0.0;
-            double stone3Price = double.tryParse(qrData.stone3Price) ?? 0.0;
-
-            // Non-Taxable Amount = sum of stone prices
-            double nonTaxable = stone1Price + stone2Price + stone3Price;
-
-            // Base Amount calculation matching QrResultBloc.calcPrice() logic
-            double baseAmount;
-            if (qrData.jarti.trim().isEmpty) {
-              baseAmount = (netWeight * (rate / 11.664)) + jyala + nonTaxable;
-            } else {
-              baseAmount = ((netWeight + jartiGram) * (rate / 11.664)) +
-                  jyala +
-                  nonTaxable;
-            }
-
-            // Taxable Amount = Base Amount - Non-Taxable Amount
-            double taxableAmount = baseAmount - nonTaxable;
-            if (taxableAmount < 0) taxableAmount = 0;
-
-            // Luxury Tax = 2% of Taxable Amount
-            double luxury = taxableAmount * 0.02;
-
-            // Total = Base Amount + Luxury Tax
-            double total = baseAmount + luxury;
-
-            // For QR scan, use MRP as total if available
-            if (qrData.code.isNotEmpty && qrData.mrp.isNotEmpty) {
-              double mrpValue =
-                  double.tryParse(qrData.mrp.replaceAll(',', '')) ?? 0.0;
-              total = mrpValue;
-            }
-
-            Widget buildRow(String title, double value) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 16)),
-                    Text("Rs ${value.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 16)),
-                  ],
-                ),
-              );
-            }
-
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  buildRow("Base Amount", baseAmount),
-                  buildRow("Non-Taxable Amount", nonTaxable),
-                  buildRow("Taxable Amount", taxableAmount),
-                  const Divider(),
-                  buildRow("Luxury Tax (2%)", luxury),
-                  const Divider(),
-                  buildRow("Total", total),
-                ],
-              ),
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+  static Widget _buildRow(String label, double value, TextStyle labelStyle, TextStyle valueStyle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: labelStyle),
+          Text("Rs ${value.toStringAsFixed(2)}", style: valueStyle),
+        ],
       ),
     );
   }
 }
-
-

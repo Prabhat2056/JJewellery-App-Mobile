@@ -1,7 +1,9 @@
 part of 'qr_result_bloc.dart';
 
 @immutable
-sealed class QrResultState {}
+sealed class QrResultState {
+  //get qrData => null;
+}
 
 final class QrResultInitial extends QrResultState {}
 

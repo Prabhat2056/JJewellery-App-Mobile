@@ -166,6 +166,13 @@ class _TabbarViewPageState extends State<TabbarViewPage>
                 stone3Id: 0,
                 stone3Weight: "",
                 stone3Price: "",
+                // Calculated fields set to 0; will be computed later
+                baseAmount: 0,
+                nonTaxableAmount: 0,
+                taxableAmount: 0,
+                luxuryAmount: 0,
+                total: 0,
+                expectedAmount: "",
               ),
             ));
           }
