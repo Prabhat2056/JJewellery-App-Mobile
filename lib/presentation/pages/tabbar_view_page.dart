@@ -173,6 +173,7 @@ class _TabbarViewPageState extends State<TabbarViewPage>
                 luxuryAmount: 0,
                 total: 0,
                 expectedAmount: "",
+                discount: 0.0,
               ),
             ));
           }

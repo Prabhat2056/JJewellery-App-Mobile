@@ -42,11 +42,13 @@ class QrResult extends StatefulWidget {
 
   @override
   State<QrResult> createState() => _QrResultState();
+  
 }
 
 class _QrResultState extends State<QrResult> {
   late bool showCalculation;
   late QrDataModel originalQrDataModel;
+  
 
   final _formKey = GlobalKey<FormState>();
 
@@ -157,6 +159,7 @@ class _QrResultState extends State<QrResult> {
             stone2PriceController.text = state.qrData.stone2Price;
             stone3PriceController.text = state.qrData.stone3Price;
             expectedAmountController.text = state.qrData.expectedAmount;
+            
             return GestureDetector(
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               child: Scaffold(
@@ -467,18 +470,25 @@ class _QrResultState extends State<QrResult> {
 
                             const Divider(),
                             ExpectedAmount(
-                              controller: expectedAmountController, 
-                              totalAmount: state.qrData.total, 
-                              jyala: double.tryParse(state.qrData.jyala) ?? 0.0,),
+                              controller: expectedAmountController,
+                              total: state.qrData.total,
+                              onExpectedAmountEntered: (expected) {
+                                setState(() {
+                                  state.qrData.total = expected;   // ⭐ Replace total everywhere
+                                  
+                                });
+                                },
                               
-                            
-                            const Divider(),
+                            ),
+
+
+
 
                             const Divider(),
                             BlocBuilder<QrResultBloc, QrResultState>(
                               buildWhen: (previous, current) =>
                                   current is QrResultPriceChangedState ||
-                                  current is QrResultInitialState,
+                                  current is QrResultInitialState, 
                               builder: (context, state) {
                                 if (state is QrResultPriceChangedState) {
                                   final qr = state.qrData;
@@ -494,6 +504,7 @@ class _QrResultState extends State<QrResult> {
                                 } else if (state is QrResultInitialState) {
                                   final qr = state.qrData;
 
+                                
                                   return LuxuryCalculationPage(
                                     baseAmount: qr.baseAmount,
                                     nonTaxableAmount: qr.nonTaxableAmount,
@@ -650,6 +661,7 @@ class _QrResultState extends State<QrResult> {
                                 : DiscountCard(
                                     qrData: state.qrData,
                                     originalQrData: originalQrData,
+                                    
                                   ),
                             const SizedBox(height: 25),
                           ],

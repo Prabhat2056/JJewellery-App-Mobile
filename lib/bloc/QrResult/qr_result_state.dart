@@ -28,3 +28,8 @@ class QrResultOnLoadingState extends QrResultState {
   final bool isLoading;
   QrResultOnLoadingState({required this.isLoading});
 }
+
+// class QrResultExpectedAmountChangedState extends QrResultState {
+//   final QrDataModel qrData;
+//   QrResultExpectedAmountChangedState({required this.qrData});
+// }

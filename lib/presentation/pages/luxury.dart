@@ -51,6 +51,8 @@ class LuxuryCalculationPage extends StatelessWidget {
     );
   }
 
+  
+
   static Widget _buildRow(String label, double value, TextStyle labelStyle, TextStyle valueStyle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),

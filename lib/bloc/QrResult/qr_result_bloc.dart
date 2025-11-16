@@ -161,8 +161,92 @@ void calcLuxuryCalculations(qrData) {
     qrData.total = total;
   }
   
-   //--------------------------------------------------------------------------------------------------
+  //------------------------------------expected amount--------------------------------------------------------------
+  void calcExpectedAmount(qrData) {
+    double expectedAmount = stringToDouble(qrData.expectedAmount);
+    double total = qrData.total;
 
+    if (expectedAmount > 0 && expectedAmount < total) {
+      qrData.total = expectedAmount;
+    } else {
+      qrData.total = total;
+    }
+  }
+//----------------------------------------Reverse calculation total from expected----------------------------------------------
+void calcTotalFromExpectedAmount(qrData) {
+  double expectedAmount = stringToDouble(qrData.expectedAmount);
+  if (expectedAmount == 0) {
+    calcLuxuryCalculations(qrData);
+    return;
+  }
+
+  double stone1Price = stringToDouble(qrData.stone1Price ?? "0.000");
+  double stone2Price = stringToDouble(qrData.stone2Price ?? "0.000");
+  double stone3Price = stringToDouble(qrData.stone3Price ?? "0.000");
+  double netWeight = qrData.netWeight.trim().isEmpty ? 0 : double.parse(qrData.netWeight);
+  double jartiGram = qrData.jarti.trim().isEmpty ? 0 : double.parse(qrData.jarti);
+  double rate = stringToDouble(qrData.rate);
+
+  double baseAmount = qrData.jarti.trim().isEmpty
+      ? (netWeight * (rate / 11.664)) + stone1Price + stone2Price + stone3Price
+      : ((netWeight + jartiGram) * (rate / 11.664)) + stone1Price + stone2Price + stone3Price;
+
+  double taxableAmount = baseAmount - (stone1Price + stone2Price + stone3Price);
+  if (taxableAmount < 0) taxableAmount = 0;
+
+  double luxuryAmount = taxableAmount * 0.02;
+  double currentTotal = baseAmount + luxuryAmount;
+
+  if (currentTotal == expectedAmount) return;
+
+  double discount = currentTotal - expectedAmount;
+  if (discount < 0) discount = 0;
+
+  // Adjust jyala first
+  double jyala = stringToDouble(qrData.jyala);
+  if (jyala >= discount) {
+    jyala -= discount;
+    discount = 0;
+  } else {
+    discount -= jyala;
+    jyala = 0;
+  }
+
+  // Adjust jarti if needed
+  double jarti = jartiGram;
+  if (discount > 0 && jarti >= discount) {
+    jarti -= discount;
+    discount = 0;
+  } else if (discount > 0) {
+    discount -= jarti;
+    jarti = 0;
+  }
+
+  // Adjust stone amounts if needed
+  double stoneTotal = stone1Price + stone2Price + stone3Price;
+  if (discount > 0 && stoneTotal >= discount) {
+    double ratio = discount / stoneTotal;
+    stone1Price *= (1 - ratio);
+    stone2Price *= (1 - ratio);
+    stone3Price *= (1 - ratio);
+  } else if (discount > 0) {
+    stone1Price = 0;
+    stone2Price = 0;
+    stone3Price = 0;
+  }
+
+  // Update qrData
+  qrData.jyala = jyala.toStringAsFixed(3);
+  qrData.jarti = jarti.toStringAsFixed(3);
+  qrData.stone1Price = stone1Price.toStringAsFixed(3);
+  qrData.stone2Price = stone2Price.toStringAsFixed(3);
+  qrData.stone3Price = stone3Price.toStringAsFixed(3);
+
+  // Recalculate totals
+  calcLuxuryCalculations(qrData);
+}
+
+//-------------------------------------------------------------------------------------------
   void calcRate(qrData, karatSettings) {
     var karat = karatSettings.where((karat) => karat["karat"] == qrData.purity);
 
@@ -246,9 +330,11 @@ void calcLuxuryCalculations(qrData) {
       calcJartiLal(event.qrData);
       calcJartiPercentage(event.qrData);
       calcRate(event.qrData, karatSettings);
-      calcJyalaPercentage(event.qrData);
+      calcJyalaPercentage(event.qrData);//
       calcPrice(event.qrData);
+      calcExpectedAmount(event.qrData);
       calcLuxuryCalculations(event.qrData);//
+      calcExpectedAmount(event.qrData);
 
       emit(
         QrResultInitialState(
@@ -292,6 +378,7 @@ void calcLuxuryCalculations(qrData) {
             luxuryAmount: event.qrData.luxuryAmount,
             total: event.qrData.total,
             expectedAmount: event.qrData.expectedAmount,
+            discount: event.qrData.discount,
           ),
         ),
       );
@@ -300,6 +387,7 @@ void calcLuxuryCalculations(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
      calcLuxuryCalculations(event.qrData);
+     calcExpectedAmount(event.qrData);
 
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
@@ -307,6 +395,7 @@ void calcLuxuryCalculations(qrData) {
       calcJyala(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
+      calcExpectedAmount(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultNetWeightChangedEvent>((event, emit) {
@@ -314,6 +403,7 @@ void calcLuxuryCalculations(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
+      calcExpectedAmount(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultRateChangedEvent>((event, emit) {
@@ -321,6 +411,7 @@ void calcLuxuryCalculations(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
+      calcExpectedAmount(event.qrData);
 
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
@@ -330,6 +421,7 @@ void calcLuxuryCalculations(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
+      calcExpectedAmount(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJartiLalChangedEvent>((event, emit) {
@@ -344,6 +436,7 @@ void calcLuxuryCalculations(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
+      calcExpectedAmount(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJartiPercentageChangedEvent>((event, emit) {
@@ -352,10 +445,18 @@ void calcLuxuryCalculations(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
+      calcExpectedAmount(event.qrData);
+      emit(QrResultPriceChangedState(qrData: event.qrData));
+    });
+    on<QrResultExpectedAmountChangedEvent>((event, emit) {
+      calcExpectedAmount(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
 
-    
+//     on<QrResultExpectedAmountChangedEvent>((event, emit) {
+//   calcTotalFromExpectedAmount(event.qrData);
+//   emit(QrResultExpectedAmountChangedState(qrData: event.qrData));
+// });
 
     on<QrResultItemChangedEvent>(
       (event, emit) {
@@ -368,3 +469,10 @@ void calcLuxuryCalculations(qrData) {
     });
   }
 }
+
+// class QrResultExpectedAmountChangedEvent extends QrResultEvent {
+//  final QrDataModel qrData;
+//  QrResultExpectedAmountChangedEvent({required this.qrData});
+// }
+
+

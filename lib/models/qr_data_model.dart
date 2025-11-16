@@ -36,6 +36,7 @@ double taxableAmount;
 double luxuryAmount;
 double total; // total
 String expectedAmount = "";
+double discount = 0.0;//
 
 
   QrDataModel({
@@ -76,6 +77,7 @@ String expectedAmount = "";
     required this.luxuryAmount ,
     required this.total ,
     required this.expectedAmount ,
+    required this.discount ,
   });
 
   Map<String, dynamic> toJson() => {
@@ -96,6 +98,7 @@ String expectedAmount = "";
         'taxableAmount': taxableAmount.toStringAsFixed(2),
         'totalAmount': total.toStringAsFixed(2),
         'expectedAmount': expectedAmount.replaceAll(',', '').trim(),
+          'discount': discount.toStringAsFixed(2),//
         'stone1Id': stone1Id,
         'stone1Qty': stone1Id == 0
             ? 0

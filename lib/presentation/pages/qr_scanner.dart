@@ -145,6 +145,7 @@ class _QrScannerState extends State<QrScanner> {
         luxuryAmount: 0,
         total: 0,
         expectedAmount: "",
+        discount: 0.0,
       );
     } catch (e) {
       falseQr = true;

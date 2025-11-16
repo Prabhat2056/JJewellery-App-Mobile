@@ -6,9 +6,16 @@ class DiscountCard extends StatefulWidget {
     super.key,
     required this.qrData,
     required this.originalQrData,
+    //required this.discountAmount,   // ⭐ NEW
+    //required this.onDiscountCalculated,
+
   });
   final QrDataModel qrData;
   final QrDataModel originalQrData;
+  //final String Function(double)? onDiscountCalculated;
+  //final double discountAmount;  // ⭐ NEW
+  
+
 
   @override
   State<DiscountCard> createState() => _DiscountCardState();
@@ -16,11 +23,21 @@ class DiscountCard extends StatefulWidget {
 
 class _DiscountCardState extends State<DiscountCard> {
   bool isExpanded = false;
+  //double manualDiscount = 0.0; // ⭐ added
+
+  
 
   double stringToDouble(String value) {
     String sanitizedValue = value.replaceAll(',', '').trim();
     return double.tryParse(sanitizedValue) ?? 0.0;
   }
+
+  // ⭐ method called from ExpectedAmount
+  // void updateDiscount(double value) {
+  //   setState(() {
+  //     manualDiscount = value;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +55,8 @@ class _DiscountCardState extends State<DiscountCard> {
             children: [
               Text(
                 "Rs. ${(stringToDouble(widget.originalQrData.price) - stringToDouble(widget.qrData.price)).toStringAsFixed(2)}",
+                //"Rs. ${widget.discountAmount.toStringAsFixed(2)}",   +widget.onDiscountCalculated?.call(discount)
+
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,

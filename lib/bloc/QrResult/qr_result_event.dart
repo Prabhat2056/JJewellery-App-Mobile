@@ -50,6 +50,11 @@ class QrResultJyalaPercentageChangedEvent extends QrResultEvent {
   QrResultJyalaPercentageChangedEvent({required this.qrData});
 }
 
+class QrResultExpectedAmountChangedEvent extends QrResultEvent {
+  final QrDataModel qrData;
+  QrResultExpectedAmountChangedEvent({required this.qrData});
+}
+
 class QrResultItemChangedEvent extends QrResultEvent {
   final QrDataModel qrData;
   QrResultItemChangedEvent({

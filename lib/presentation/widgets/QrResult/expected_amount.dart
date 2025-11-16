@@ -1,17 +1,19 @@
 
-
+// //-------------------------------------------display discount-----------------------------------------------
 // import 'package:flutter/material.dart';
 
 // class ExpectedAmount extends StatefulWidget {
 //   final TextEditingController controller;
-//   final double totalAmount;
+//   final double total;
 //   final void Function(double)? onDiscountCalculated;
+//   final void Function(String)? onChanged;
 
 //   const ExpectedAmount({
 //     super.key,
 //     required this.controller,
-//     required this.totalAmount,
+//     required this.total,
 //     this.onDiscountCalculated,
+//     this.onChanged,
 //   });
 
 //   @override
@@ -30,7 +32,7 @@
 //     }
 
 //     final expected = double.tryParse(expectedText) ?? 0.0;
-//     final total = widget.totalAmount;
+//     final total = widget.total;
 //     final calculated = total - expected;
 
 //     setState(() {
@@ -38,6 +40,10 @@
 //     });
 
 //     widget.onDiscountCalculated?.call(discount);
+//   }
+
+//   void _onChanged(String value) {
+//     widget.onChanged?.call(value);
 //   }
 
 //   void _toggleDiscount() {
@@ -88,6 +94,7 @@
 //                   keyboardType: TextInputType.number,
 //                   onChanged: (val) {
 //                     if (showDiscountText) _calculateDiscount();
+//                     _onChanged(val);
 //                   },
 //                   decoration: InputDecoration(
 //                     hintText: "Enter amount",
@@ -142,20 +149,24 @@
 // }
 
 
+//-------------------------------------------display discount-----------------------------------------------
 import 'package:flutter/material.dart';
 
 class ExpectedAmount extends StatefulWidget {
   final TextEditingController controller;
-  final double totalAmount; // 🧮 total to compare with
-  final double jyala; // base jyala value
-  final void Function(double discount, double jyala)? onValuesChanged;
+  final double total;
+  final void Function(double)? onDiscountCalculated;
+  final void Function(String)? onChanged;
+
+    //final void Function(double)? onExpectedAmountEntered;   // ⭐ NEW
 
   const ExpectedAmount({
     super.key,
     required this.controller,
-    required this.totalAmount,
-    required this.jyala,
-    this.onValuesChanged,
+    required this.total,
+    this.onDiscountCalculated,
+    this.onChanged, required Null Function(dynamic expected) onExpectedAmountEntered,
+     //this.onExpectedAmountEntered,   // ⭐ NEW
   });
 
   @override
@@ -165,35 +176,43 @@ class ExpectedAmount extends StatefulWidget {
 class _ExpectedAmountState extends State<ExpectedAmount> {
   bool showDiscountText = false;
   double discount = 0.0;
-  double calculatedJyala = 0.0;
 
-  void _calculateDiscountAndJyala() {
+  String savedValue = ""; // ⭐ NEW: keeps text even on rebuild
+
+  @override
+  void initState() {
+    super.initState();
+    savedValue = widget.controller.text; // save initial value
+  }
+
+  void _calculateDiscount() {
     final expectedText = widget.controller.text.trim();
     if (expectedText.isEmpty) {
-      setState(() {
-        discount = 0.0;
-        calculatedJyala = widget.jyala;
-      });
+      setState(() => discount = 0.0);
       return;
     }
 
     final expected = double.tryParse(expectedText) ?? 0.0;
-    final total = widget.totalAmount;
-
-    final calculatedDiscount = total - expected;
-    double newJyala = widget.jyala;
-
-    // Apply jyala logic only if discount <= jyala
-    if (calculatedDiscount <= widget.jyala) {
-      newJyala = widget.jyala - calculatedDiscount;
-    }
+    final total = widget.total;
+    final calculated = total - expected;
 
     setState(() {
-      discount = calculatedDiscount < 0 ? 0 : calculatedDiscount;
-      calculatedJyala = newJyala;
+      discount = calculated < 0 ? 0 : calculated;
     });
 
-    widget.onValuesChanged?.call(discount, calculatedJyala);
+    widget.onDiscountCalculated?.call(discount);
+    //widget.onExpectedAmountEntered?.call(expected);   // ⭐ Send expected amount to parent
+  }
+
+  void _onChanged(String value) {
+    savedValue = value;                      // ⭐ NEW: keep value permanently
+    widget.onChanged?.call(value);
+  }
+
+  @override
+  void didUpdateWidget(ExpectedAmount oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    widget.controller.text = savedValue;     // ⭐ NEW: restore value if parent rebuilds
   }
 
   void _toggleDiscount() {
@@ -202,7 +221,7 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
     });
 
     if (showDiscountText) {
-      _calculateDiscountAndJyala();
+      _calculateDiscount();
     }
   }
 
@@ -235,7 +254,6 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
           ),
           const SizedBox(height: 12),
 
-          // Row with TextField + dropdown icon
           Row(
             children: [
               Expanded(
@@ -243,7 +261,9 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
                   controller: widget.controller,
                   keyboardType: TextInputType.number,
                   onChanged: (val) {
-                    if (showDiscountText) _calculateDiscountAndJyala();
+                    //widget.onChanged?.call(val);
+                    if (showDiscountText) _calculateDiscount();
+                    _onChanged(val);
                   },
                   decoration: InputDecoration(
                     hintText: "Enter amount",
@@ -258,6 +278,7 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
                 ),
               ),
               const SizedBox(width: 8),
+
               InkWell(
                 onTap: _toggleDiscount,
                 borderRadius: BorderRadius.circular(8),
@@ -277,7 +298,6 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
             ],
           ),
 
-          // Display discount and jyala below
           if (showDiscountText) ...[
             const SizedBox(height: 8),
             Text(
@@ -288,19 +308,9 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              "Jyala: Rs ${calculatedJyala.toStringAsFixed(2)}",
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.blueGrey,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
           ],
         ],
       ),
     );
   }
 }
-
