@@ -246,7 +246,13 @@ void calcTotalFromExpectedAmount(qrData) {
   calcLuxuryCalculations(qrData);
 }
 
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------total discount--------------------------------------------
+// void calcTotalDiscount(qrData) {
+//   double expectedAmountDiscount = stringToDouble(qrData.expectedAmount);
+
+
+
+
   void calcRate(qrData, karatSettings) {
     var karat = karatSettings.where((karat) => karat["karat"] == qrData.purity);
 
@@ -378,7 +384,7 @@ void calcTotalFromExpectedAmount(qrData) {
             luxuryAmount: event.qrData.luxuryAmount,
             total: event.qrData.total,
             expectedAmount: event.qrData.expectedAmount,
-            discount: event.qrData.discount,
+            expectedAmountDiscount: event.qrData.expectedAmountDiscount,
           ),
         ),
       );

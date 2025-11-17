@@ -472,12 +472,17 @@ class _QrResultState extends State<QrResult> {
                             ExpectedAmount(
                               controller: expectedAmountController,
                               total: state.qrData.total,
-                              onExpectedAmountEntered: (expected) {
-                                setState(() {
-                                  state.qrData.total = expected;   // ⭐ Replace total everywhere
+                              // onExpectedAmountEntered: (expected) {
+                              //   setState(() {
+                              //     state.qrData.total = expected;   // ⭐ Replace total everywhere
                                   
+                              //   });
+                              //   },
+                              onDiscountCalculated: (discount) {
+                                setState(() {
+                                  state.qrData.expectedAmountDiscount = discount;  // ⭐ Store saved discount
                                 });
-                                },
+                              }, onExpectedAmountEntered: (expected) {  },
                               
                             ),
 
@@ -658,7 +663,7 @@ class _QrResultState extends State<QrResult> {
                             const SizedBox(height: 15),
                             state.qrData.code.isEmpty
                                 ? const SizedBox.shrink()
-                                : DiscountCard(
+                                : DiscountSummaryWidget(
                                     qrData: state.qrData,
                                     originalQrData: originalQrData,
                                     
