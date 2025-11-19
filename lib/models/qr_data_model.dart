@@ -10,6 +10,7 @@ class QrDataModel {
   String netWeight;
   String purity;
   String jarti;
+  //String jartiAmount;
   String jartiLal;
   String jartiPercentage;
   String jyala;
@@ -53,6 +54,7 @@ double expectedAmountDiscount = 0.0; // ⭐ NEW FIELD
     required this.netWeight,
     required this.purity,
     required this.jarti,
+    //required this.jartiAmount,
     required this.jartiLal,
     required this.jartiPercentage,
     required this.jyala,
@@ -92,6 +94,7 @@ double expectedAmountDiscount = 0.0; // ⭐ NEW FIELD
         'rate': rate.replaceAll(',', '').trim(),
         'amount': price.replaceAll(',', '').trim(),
         'jartiQty': jarti,
+        
         'jartiPercent': jartiPercentage,
         'jyalaAmount': jyala.replaceAll(',', '').trim(),
         //'luxuryPercent': luxuryPercentage,//

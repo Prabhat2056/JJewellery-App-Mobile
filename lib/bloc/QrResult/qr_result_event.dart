@@ -63,6 +63,11 @@ class QrResultItemChangedEvent extends QrResultEvent {
 }
 
 
+class QrResultExpectedAmountDiscountChangedEvent extends QrResultEvent {
+  final QrDataModel qrData;
+  
+  QrResultExpectedAmountDiscountChangedEvent({required this.qrData});
+}
 
 
 class QrResultOnLoadingEvent extends QrResultEvent {

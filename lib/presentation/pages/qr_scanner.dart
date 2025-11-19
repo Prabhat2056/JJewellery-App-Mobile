@@ -117,6 +117,7 @@ class _QrScannerState extends State<QrScanner> {
         netWeight: values[4],
         purity: values[5],
         jarti: values[6],
+        //jartiAmount: values[18],
         jyala: values[7],
         stone1Name: findStoneName(values[8]),
         stone1Id: 0,

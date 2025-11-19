@@ -149,6 +149,7 @@ class _TabbarViewPageState extends State<TabbarViewPage>
                 jartiPercentage: "0",
                 jartiLal: "",
                 jyala: "0",
+                //jartiAmount: '0',
                 jyalaPercentage: "0",
                 mrp: "",
                 price: "",

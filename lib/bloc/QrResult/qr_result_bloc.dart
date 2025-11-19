@@ -10,6 +10,7 @@ part 'qr_result_event.dart';
 part 'qr_result_state.dart';
 
 class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
+  
   double stringToDouble(String value) {
     String sanitizedValue = value.replaceAll(',', '').trim();
     return double.tryParse(sanitizedValue) ?? 0.0;
@@ -110,6 +111,8 @@ class QrResultBloc extends Bloc<QrResultEvent, QrResultState> {
         .toStringAsFixed(3);
   }
 
+  
+
   //---------------------------------------luxury calculation-----------------------------------------------------------
 
   void calcLuxury(qrData) {
@@ -131,17 +134,7 @@ void calcLuxuryCalculations(qrData) {
     double rate = stringToDouble(qrData.rate);
     double jyala = stringToDouble(qrData.jyala);
 
-    // if (rate == 0) {
-    //   qrData.baseAmount = 0;
-    //   qrData.nonTaxableAmount = 0;
-    //   qrData.taxableAmount = 0;
-    //   qrData.luxuryAmount = 0;
-    //   qrData.total = 0;
-    //   return;
-    // }
-    // else if (jyala < 0) {
-    //   jyala = 0;
-    // }
+   
 
 
    double nonTaxableAmount = stone1Price + stone2Price + stone3Price;
@@ -173,83 +166,140 @@ void calcLuxuryCalculations(qrData) {
     }
   }
 //----------------------------------------Reverse calculation total from expected----------------------------------------------
+
+// void calcTaxableAmount(qrData){
+//   double netWeight = qrData.netWeight.trim().isEmpty ? 0 : double.parse(qrData.netWeight);
+//   double jartiGram = qrData.jarti.trim().isEmpty ? 0 : double.parse(qrData.jarti);
+//   double rate = stringToDouble(qrData.rate);
+//   double jyala = stringToDouble(qrData.jyala);
+
+//   double netWeightAmount = netWeight * (rate / 11.664);
+//   double jartiAmount = jartiGram * (rate / 11.664);
+//   double jyalaAmt = jyala;
+
+//   double taxableAmount = netWeightAmount + jartiAmount + jyalaAmt;
+//   qrData.taxableAmount = taxableAmount;
+// }
+
+
 void calcTotalFromExpectedAmount(qrData) {
+  // 1️⃣ Parse expected amount
   double expectedAmount = stringToDouble(qrData.expectedAmount);
   if (expectedAmount == 0) {
     calcLuxuryCalculations(qrData);
     return;
   }
 
-  double stone1Price = stringToDouble(qrData.stone1Price ?? "0.000");
-  double stone2Price = stringToDouble(qrData.stone2Price ?? "0.000");
-  double stone3Price = stringToDouble(qrData.stone3Price ?? "0.000");
-  double netWeight = qrData.netWeight.trim().isEmpty ? 0 : double.parse(qrData.netWeight);
-  double jartiGram = qrData.jarti.trim().isEmpty ? 0 : double.parse(qrData.jarti);
+  // 2️⃣ Parse expectedAmountDiscount
+  double expectedAmountDiscount =
+      stringToDouble(qrData.expectedAmountDiscount);
+
+  // 3️⃣ Parse component values
+  double stone1Price = stringToDouble(qrData.stone1Price);
+  double stone2Price = stringToDouble(qrData.stone2Price);
+  double stone3Price = stringToDouble(qrData.stone3Price);
+  double netWeight = qrData.netWeight.trim().isEmpty
+      ? 0
+      : double.parse(qrData.netWeight);
+  double jartiGram = qrData.jarti.trim().isEmpty
+      ? 0
+      : double.parse(qrData.jarti);
+  double jyala = stringToDouble(qrData.jyala);
   double rate = stringToDouble(qrData.rate);
 
-  double baseAmount = qrData.jarti.trim().isEmpty
-      ? (netWeight * (rate / 11.664)) + stone1Price + stone2Price + stone3Price
-      : ((netWeight + jartiGram) * (rate / 11.664)) + stone1Price + stone2Price + stone3Price;
+  double jartiAmount = jartiGram * (rate / 11.664);
 
-  double taxableAmount = baseAmount - (stone1Price + stone2Price + stone3Price);
-  if (taxableAmount < 0) taxableAmount = 0;
+  // 4️⃣ Copy components into local variables
+  double netWeightAmount = netWeight * (rate / 11.664);
+  double jyalaAmt = jyala;
+  double jartiAmt = jartiAmount;
+  double stone1 = stone1Price;
+  double stone2 = stone2Price;
+  double stone3 = stone3Price;
+  // ignore: unused_local_variable
+  double stoneTotal = stone1 + stone2 + stone3;
 
+  // 5️⃣ Apply ExpectedAmountDiscount based on flow diagram
+  if (expectedAmountDiscount <= jyalaAmt) {
+    // Reduce Jyala only
+    jyalaAmt -= expectedAmountDiscount;
+    jyala = jyalaAmt;
+  } else if (expectedAmountDiscount > jyalaAmt && expectedAmountDiscount <= jartiAmt) {
+    // Reduce Jarti only
+    jartiAmt -= expectedAmountDiscount;
+    jartiAmount = jartiAmt;
+  } else if (expectedAmountDiscount > jartiAmt) {
+    // Reduce Stones only
+    // if (stoneTotal > 0) {
+    //   double ratio = expectedAmountDiscount / stoneTotal;
+    //   stone1 *= (1 - ratio);
+    //   stone2 *= (1 - ratio);
+    //   stone3 *= (1 - ratio);
+    // }
+    stoneTotal -= expectedAmountDiscount;
+  }
+
+  // 6️⃣ Recalculate taxable amount (Jyala + Jarti + NetWeight)
+  double taxableAmount = netWeightAmount + jartiAmt + jyalaAmt;
+  double nonTaxableAmount = stone1 + stone2 + stone3;
+  double baseAmount = taxableAmount + nonTaxableAmount;
+
+  // 7️⃣ Apply luxury tax (2%) on taxable amount
   double luxuryAmount = taxableAmount * 0.02;
-  double currentTotal = baseAmount + luxuryAmount;
 
-  if (currentTotal == expectedAmount) return;
+  // 8️⃣ Compute total
+  // ignore: unused_local_variable
+  double total = baseAmount + luxuryAmount;
+  
 
-  double discount = currentTotal - expectedAmount;
-  if (discount < 0) discount = 0;
+  // 9️⃣ Save updated amounts back to qrData
+  qrData.jyala = jyalaAmt.toStringAsFixed(3);
+  qrData.jarti = jartiAmt.toStringAsFixed(3);
+  qrData.stone1Price = stone1.toStringAsFixed(3);
+  qrData.stone2Price = stone2.toStringAsFixed(3);
+  qrData.stone3Price = stone3.toStringAsFixed(3);
 
-  // Adjust jyala first
-  double jyala = stringToDouble(qrData.jyala);
-  if (jyala >= discount) {
-    jyala -= discount;
-    discount = 0;
-  } else {
-    discount -= jyala;
-    jyala = 0;
-  }
-
-  // Adjust jarti if needed
-  double jarti = jartiGram;
-  if (discount > 0 && jarti >= discount) {
-    jarti -= discount;
-    discount = 0;
-  } else if (discount > 0) {
-    discount -= jarti;
-    jarti = 0;
-  }
-
-  // Adjust stone amounts if needed
-  double stoneTotal = stone1Price + stone2Price + stone3Price;
-  if (discount > 0 && stoneTotal >= discount) {
-    double ratio = discount / stoneTotal;
-    stone1Price *= (1 - ratio);
-    stone2Price *= (1 - ratio);
-    stone3Price *= (1 - ratio);
-  } else if (discount > 0) {
-    stone1Price = 0;
-    stone2Price = 0;
-    stone3Price = 0;
-  }
-
-  // Update qrData
-  qrData.jyala = jyala.toStringAsFixed(3);
-  qrData.jarti = jarti.toStringAsFixed(3);
-  qrData.stone1Price = stone1Price.toStringAsFixed(3);
-  qrData.stone2Price = stone2Price.toStringAsFixed(3);
-  qrData.stone3Price = stone3Price.toStringAsFixed(3);
-
-  // Recalculate totals
+  // 1️⃣0️⃣ Recalculate totals
   calcLuxuryCalculations(qrData);
 }
 
-//-----------------------------------------------total discount--------------------------------------------
-// void calcTotalDiscount(qrData) {
-//   double expectedAmountDiscount = stringToDouble(qrData.expectedAmount);
 
+
+
+
+
+
+ //-----------------------------------------------total expectedAmountDiscount--------------------------------------------
+ void calcExpectedAmountDiscount(qrData) {
+   double expectedAmount = stringToDouble(qrData.expectedAmount);
+   double total = qrData.total;
+   //double expectedAmountDiscount = stringToDouble(qrData.expectedAmountDiscount ?? "0.000");
+
+   // ignore: unused_local_variable
+   double expectedAmountDiscount = total - expectedAmount;
+ }
+
+   //--------------------------------------------------total calculation-------------------------------------------------
+// void calcTotal(qrData) {
+//     double netWeight = qrData.netWeight.trim().isEmpty ? 0 : double.parse(qrData.netWeight);
+//     double jartiGram = qrData.jarti.trim().isEmpty ? 0 : double.parse(qrData.jarti);
+//     double rate = stringToDouble(qrData.rate);
+//     double jyala = stringToDouble(qrData.jyala);
+//     double stone1Price = stringToDouble(qrData.stone1Price ?? "0.000");
+//     double stone2Price = stringToDouble(qrData.stone2Price ?? "0.000");
+//     double stone3Price = stringToDouble(qrData.stone3Price ?? "0.000");
+
+//     double baseAmount = qrData.jarti.trim().isEmpty
+//         ? (netWeight * (rate / 11.664)) + jyala + stone1Price + stone2Price + stone3Price
+//         : ((netWeight + jartiGram) * (rate / 11.664)) + jyala + stone1Price + stone2Price + stone3Price;
+
+//     double luxuryAmount = baseAmount * 0.02;
+//     double total = baseAmount + luxuryAmount;
+
+//     qrData.baseAmount = baseAmount;
+//     qrData.luxuryAmount = luxuryAmount;
+//     qrData.total = total;
+//   }
 
 
 
@@ -338,9 +388,10 @@ void calcTotalFromExpectedAmount(qrData) {
       calcRate(event.qrData, karatSettings);
       calcJyalaPercentage(event.qrData);//
       calcPrice(event.qrData);
-      calcExpectedAmount(event.qrData);
+      //calcTotal( event.qrData);
       calcLuxuryCalculations(event.qrData);//
       calcExpectedAmount(event.qrData);
+      
 
       emit(
         QrResultInitialState(
@@ -358,6 +409,7 @@ void calcTotalFromExpectedAmount(qrData) {
             netWeight: event.qrData.netWeight,
             purity: event.qrData.purity,
             jarti: event.qrData.jarti,
+            //jartiAmount: event.qrData.jartiAmount,
             jartiLal: event.qrData.jartiLal,
             jartiPercentage: event.qrData.jartiPercentage,
             jyala: event.qrData.jyala,
@@ -393,7 +445,8 @@ void calcTotalFromExpectedAmount(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
      calcLuxuryCalculations(event.qrData);
-     calcExpectedAmount(event.qrData);
+     //calcTaxableAmount(event.qrData);
+     
 
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
@@ -401,7 +454,7 @@ void calcTotalFromExpectedAmount(qrData) {
       calcJyala(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
-      calcExpectedAmount(event.qrData);
+      
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultNetWeightChangedEvent>((event, emit) {
@@ -409,7 +462,7 @@ void calcTotalFromExpectedAmount(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
-      calcExpectedAmount(event.qrData);
+      
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultRateChangedEvent>((event, emit) {
@@ -417,7 +470,7 @@ void calcTotalFromExpectedAmount(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
-      calcExpectedAmount(event.qrData);
+      
 
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
@@ -427,7 +480,7 @@ void calcTotalFromExpectedAmount(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
-      calcExpectedAmount(event.qrData);
+      
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJartiLalChangedEvent>((event, emit) {
@@ -442,7 +495,7 @@ void calcTotalFromExpectedAmount(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
-      calcExpectedAmount(event.qrData);
+      
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultJartiPercentageChangedEvent>((event, emit) {
@@ -451,18 +504,24 @@ void calcTotalFromExpectedAmount(qrData) {
       calcJyalaPercentage(event.qrData);
       calcPrice(event.qrData);
       calcLuxuryCalculations(event.qrData);
-      calcExpectedAmount(event.qrData);
+      
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
     on<QrResultExpectedAmountChangedEvent>((event, emit) {
-      calcExpectedAmount(event.qrData);
+      event.qrData.expectedAmount = event.qrData.expectedAmount; // Already set in qr_result.dart
+      calcTotalFromExpectedAmount(event.qrData);
+      calcJyala(event.qrData);
+      calcLuxuryCalculations(event.qrData);
+      calcExpectedAmountDiscount(event.qrData);
       emit(QrResultPriceChangedState(qrData: event.qrData));
     });
 
-//     on<QrResultExpectedAmountChangedEvent>((event, emit) {
-//   calcTotalFromExpectedAmount(event.qrData);
-//   emit(QrResultExpectedAmountChangedState(qrData: event.qrData));
-// });
+    on<QrResultExpectedAmountDiscountChangedEvent>((event, emit) {
+      calcTotalFromExpectedAmount(event.qrData);
+      calcJyala(event.qrData);
+      calcLuxuryCalculations(event.qrData);
+  emit(QrResultTotalChangedState(qrData: event.qrData));
+});
 
     on<QrResultItemChangedEvent>(
       (event, emit) {
@@ -475,6 +534,15 @@ void calcTotalFromExpectedAmount(qrData) {
     });
   }
 }
+
+class QrResultTotalChangedState extends QrResultState {
+  final QrDataModel qrData;
+  QrResultTotalChangedState({required this.qrData});
+}
+
+
+
+
 
 // class QrResultExpectedAmountChangedEvent extends QrResultEvent {
 //  final QrDataModel qrData;

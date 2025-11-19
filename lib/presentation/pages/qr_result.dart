@@ -159,6 +159,54 @@ class _QrResultState extends State<QrResult> {
             stone2PriceController.text = state.qrData.stone2Price;
             stone3PriceController.text = state.qrData.stone3Price;
             expectedAmountController.text = state.qrData.expectedAmount;
+
+// return BlocConsumer<QrResultBloc, QrResultState>(
+//   listener: (context, state) {
+//     if (state is QrResultPriceChangedState ||
+//         state is QrResultExpectedAmountDiscountChangedState) {
+      
+//       final qr = state.qrData;
+
+//       jartiPercentageController.text = qr.jartiPercentage;
+//       jartiGramController.text = qr.jarti;
+//       jartiLalController.text = qr.jartiLal;
+//       jyalaPercentageController.text = qr.jyalaPercentage;
+//       jyalaController.text = qr.jyala;
+//       rateController.text = qr.rate;
+//       itemController.text = qr.item;
+//       expectedAmountController.text = qr.expectedAmount;
+//     }
+//   },
+
+//   // 🔥 FIXED: UI now rebuilds on all relevant states
+//   buildWhen: (previous, current) =>
+//       current is QrResultInitialState ||
+//       current is QrResultPriceChangedState ||
+//       current is QrResultExpectedAmountDiscountChangedState,
+
+//   builder: (context, state) {
+//     if (state is QrResultInitialState) {
+//       final qr = state.qrData;
+
+//       itemController.text = qr.item;
+//       grossWeightController.text = qr.grossWeight;
+//       netWeightController.text = qr.netWeight;
+//       rateController.text = qr.rate;
+//       jyalaController.text = qr.jyala;
+//       jartiPercentageController.text = qr.jartiPercentage;
+//       jartiGramController.text = qr.jarti;
+//       jartiLalController.text = qr.jartiLal;
+//       jyalaPercentageController.text = qr.jyalaPercentage;
+//       expectedAmountController.text = qr.expectedAmount;
+
+//       // plus stones etc...
+//     }
+
+    
+  
+
+
+       
             
             return GestureDetector(
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -482,7 +530,13 @@ class _QrResultState extends State<QrResult> {
                                 setState(() {
                                   state.qrData.expectedAmountDiscount = discount;  // ⭐ Store saved discount
                                 });
-                              }, onExpectedAmountEntered: (expected) {  },
+                              }, 
+                              onExpectedAmountEntered: (expected) {
+                               state.qrData.expectedAmount = expected.toString();
+                                BlocProvider.of<QrResultBloc>(context).add(
+                                  QrResultExpectedAmountChangedEvent(qrData: state.qrData),
+                                );
+                              },
                               
                             ),
 
@@ -825,6 +879,11 @@ class _QrResultState extends State<QrResult> {
               child: CircularProgressIndicator(),
             );
           }
-        });
+        }
+      );
   }
 }
+
+
+
+

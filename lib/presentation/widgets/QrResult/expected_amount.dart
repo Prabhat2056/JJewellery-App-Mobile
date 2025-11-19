@@ -10,16 +10,16 @@ class ExpectedAmount extends StatefulWidget {
   final void Function(double)? onDiscountCalculated;
   final void Function(String)? onChanged;
 
-    final void Function(double)? onExpectedAmountEntered;   // ⭐ NEW
+  final void Function(double)? onExpectedAmountEntered;
+  //final double jyalaAmt = 0.123; // Example fixed jyala amount
 
   const ExpectedAmount({
     super.key,
     required this.controller,
     required this.total,
     this.onDiscountCalculated,
-    //this.onChanged, required Null Function(dynamic expected) onExpectedAmountEntered,
     this.onChanged,
-     this.onExpectedAmountEntered,   // ⭐ NEW
+    this.onExpectedAmountEntered,
   });
 
   @override
@@ -29,13 +29,14 @@ class ExpectedAmount extends StatefulWidget {
 class _ExpectedAmountState extends State<ExpectedAmount> {
   bool showDiscountText = false;
   double discount = 0.0;
+  
 
-  String savedValue = ""; // ⭐ NEW: keeps text even on rebuild
+  String savedValue = "";
 
   @override
   void initState() {
     super.initState();
-    savedValue = widget.controller.text; // save initial value
+    savedValue = widget.controller.text; 
   }
 
   void _calculateDiscount() {
@@ -54,33 +55,51 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
     });
 
     widget.onDiscountCalculated?.call(discount);
-    //widget.onExpectedAmountEntered?.call(expected);   // ⭐ Send expected amount to parent
+    widget.onExpectedAmountEntered?.call(expected);
   }
 
   void _onChanged(String value) {
-    savedValue = value;                      // ⭐ NEW: keep value permanently
+    savedValue = value;
     widget.onChanged?.call(value);
-  }
-
-  @override
-  void didUpdateWidget(ExpectedAmount oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    widget.controller.text = savedValue;     // ⭐ NEW: restore value if parent rebuilds
-
-    if (oldWidget.total != widget.total) {
-      _calculateDiscount(); // Recalculate discount when total changes
-   }
-  }
-
-  void _toggleDiscount() {
-    setState(() {
-      showDiscountText = !showDiscountText;
-    });
 
     if (showDiscountText) {
       _calculateDiscount();
     }
   }
+
+  @override
+  void didUpdateWidget(ExpectedAmount oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Restore the saved user input after any rebuild
+    widget.controller.text = savedValue;
+
+    // ❌ IMPORTANT: Do NOT recalculate discount here
+    // Discount should only recalc when dropdown is opened.
+  }
+
+  // void _toggleDiscount() {
+  //   setState(() {
+  //     showDiscountText = !showDiscountText;
+  //   });
+
+  //   if (showDiscountText) {
+  //     _calculateDiscount();
+  //   }
+  // }
+
+  void _toggleDiscount() {
+  setState(() {
+    showDiscountText = !showDiscountText;
+  });
+
+  // Calculate ONLY the first time dropdown is opened
+  if (showDiscountText && !discountCalculatedOnce) {
+    _calculateDiscount();
+    discountCalculatedOnce = true;
+  }
+}
+  bool discountCalculatedOnce = false;
 
   @override
   Widget build(BuildContext context) {
@@ -117,11 +136,7 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
                 child: TextField(
                   controller: widget.controller,
                   keyboardType: TextInputType.number,
-                  onChanged: (val) {
-                    //widget.onChanged?.call(val);
-                    if (showDiscountText) _calculateDiscount();
-                    _onChanged(val);
-                  },
+                  onChanged: _onChanged,
                   decoration: InputDecoration(
                     hintText: "Enter amount",
                     border: OutlineInputBorder(
@@ -165,122 +180,18 @@ class _ExpectedAmountState extends State<ExpectedAmount> {
                 fontWeight: FontWeight.w600,
               ),
             ),
+            // Text(
+            //   "Jyala: Rs ${jyalaAmt.toStringAsFixed(3)}",
+            //   style: const TextStyle(
+            //     fontSize: 14,
+            //     color: Colors.green,
+            //     fontWeight: FontWeight.w600,
+            //   ),
+            // ),
           ],
         ],
       ),
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-
-// class ExpectedAmount extends StatefulWidget {
-//   final TextEditingController controller;
-//   final double total;
-//   final void Function(double)? onDiscountCalculated;
-
-//   const ExpectedAmount({
-//     super.key,
-//     required this.controller,
-//     required this.total,
-//     this.onDiscountCalculated,
-//   });
-
-//   @override
-//   State<ExpectedAmount> createState() => _ExpectedAmountState();
-// }
-
-// class _ExpectedAmountState extends State<ExpectedAmount> {
-//   bool showDiscountText = false;
-//   double discount = 0.0;
-
-//   void _calculateDiscount() {
-//     final input = widget.controller.text.trim();
-//     if (input.isEmpty) {
-//       setState(() => discount = 0.0);
-//       widget.onDiscountCalculated?.call(0.0);
-//       return;
-//     }
-
-//     final expected = double.tryParse(input) ?? 0.0;
-//     final total = widget.total;
-
-//     discount = (total - expected).clamp(0, double.infinity);
-
-//     setState(() {});
-//     widget.onDiscountCalculated?.call(discount); // ⭐ sends discount upward
-//   }
-
-//   void _toggle() {
-//     setState(() => showDiscountText = !showDiscountText);
-//     if (showDiscountText) _calculateDiscount();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.all(12),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(16),
-//         boxShadow: const [
-//           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-//         ],
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.center,
-//         children: [
-//           const Text(
-//             "Expected Amount",
-//             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-//           ),
-
-//           const SizedBox(height: 12),
-
-//           Row(
-//             children: [
-//               Expanded(
-//                 child: TextField(
-//                   controller: widget.controller,
-//                   keyboardType: TextInputType.number,
-//                   onChanged: (_) {
-//                     if (showDiscountText) _calculateDiscount();
-//                   },
-//                   decoration: InputDecoration(
-//                     hintText: "Enter amount",
-//                     border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               const SizedBox(width: 8),
-
-//               InkWell(
-//                 onTap: _toggle,
-//                 child: const Icon(
-//                   Icons.arrow_drop_down_circle_outlined,
-//                   size: 30,
-//                   color: Colors.black54,
-//                 ),
-//               )
-//             ],
-//           ),
-
-//           if (showDiscountText) ...[
-//             const SizedBox(height: 10),
-//             Text(
-//               "Discount: Rs ${discount.toStringAsFixed(2)}",
-//               style: const TextStyle(
-//                 fontSize: 14,
-//                 color: Colors.green,
-//                 fontWeight: FontWeight.w600,
-//               ),
-//             )
-//           ]
-//         ],
-//       ),
-//     );
-//   }
-// }
 
