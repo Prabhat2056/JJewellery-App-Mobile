@@ -37,7 +37,7 @@ class _DiscountSummaryWidgetState extends State<DiscountSummaryWidget> {
     double itemDiscount = originalPrice - discountedPrice;
 
     // Extra discount entered via ExpectedAmount
-    double expectedDiscount = widget.qrData.expectedAmountDiscount;
+    double expectedDiscount = stringToDouble(widget.qrData.expectedAmountDiscount);//
 
     // Total discount
     double totalDiscount = itemDiscount + expectedDiscount;
@@ -119,13 +119,17 @@ class _DiscountSummaryWidgetState extends State<DiscountSummaryWidget> {
               _buildDiscountRow(
                 t1: "Jyala",
                 t2: widget.originalQrData.jyala,
-                t3: widget.qrData.jyala,
+                //t3: widget.qrData.jyala,
+                t3: (widget.qrData.newJyala.isNotEmpty && widget.qrData.newJyala != "0.000")
+                  ? widget.qrData.newJyala  // Show newJyala if calculated
+                  : widget.qrData.jyala,   
                 width: width,
               ),
               _buildDiscountRow(
                 t1: "Stone 1",
                 t2: widget.originalQrData.stone1Price,
                 t3: widget.qrData.stone1Price,
+                
                 width: width,
               ),
               _buildDiscountRow(

@@ -49,11 +49,30 @@ class QrResultJyalaPercentageChangedEvent extends QrResultEvent {
   final QrDataModel qrData;
   QrResultJyalaPercentageChangedEvent({required this.qrData});
 }
+class QrResultPriceChangedEvent extends QrResultEvent {
+  final QrDataModel qrData;
+  QrResultPriceChangedEvent({required this.qrData});
+}
 
+
+
+//Event
 class QrResultExpectedAmountChangedEvent extends QrResultEvent {
   final QrDataModel qrData;
-  QrResultExpectedAmountChangedEvent({required this.qrData});
+  QrResultExpectedAmountChangedEvent(String expectedAmount,  {required this.qrData});
+
+  //get widget => null;
+  //QrResultExpectedAmountChangedEvent(this.qrData, {required QrDataModel qrData}); // Positional argument
 }
+
+// class QrResultExpectedAmountChangedEvent extends QrResultEvent {
+//   final String expectedAmount;
+//   QrResultExpectedAmountChangedEvent({required this.expectedAmount});
+// }
+
+
+
+
 
 class QrResultItemChangedEvent extends QrResultEvent {
   final QrDataModel qrData;
@@ -65,7 +84,7 @@ class QrResultItemChangedEvent extends QrResultEvent {
 
 class QrResultExpectedAmountDiscountChangedEvent extends QrResultEvent {
   final QrDataModel qrData;
-  
+
   QrResultExpectedAmountDiscountChangedEvent({required this.qrData});
 }
 
@@ -75,3 +94,14 @@ class QrResultOnLoadingEvent extends QrResultEvent {
 
   QrResultOnLoadingEvent({required this.isLoading});
 }
+
+// class QrResultResetToOriginalEvent extends QrResultEvent {
+//   final QrDataModel qrData;
+
+//   QrResultResetToOriginalEvent({required this.qrData});
+// }
+
+// class QrResultResetToOriginalEvent extends QrResultEvent {
+  
+//   QrResultResetToOriginalEvent();
+// }

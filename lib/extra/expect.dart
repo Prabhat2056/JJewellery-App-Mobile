@@ -647,3 +647,167 @@
 
 //   calcLuxuryCalculations(qrData);
 // }
+
+
+
+//                             ExpectedAmount(
+//   controller: expectedAmountController,
+//   total: state.qrData.total,
+//   onExpectedAmountEntered: (expected) {
+//     // 1. Update qrData locally
+//     state.qrData.expectedAmount = expected.toString();
+
+//     // 2. Emit a BLoC event so UI rebuilds
+//     BlocProvider.of<QrResultBloc>(context).add(
+//       QrResultExpectedAmountChangedEvent(qrData: state.qrData),
+//     );
+//   },
+//   onDiscountCalculated: (discount) {
+//     state.qrData.expectedAmountDiscount = discount;
+//     BlocProvider.of<QrResultBloc>(context).add(
+//       QrResultExpectedAmountDiscountChangedEvent(qrData: state.qrData),
+//     );
+//   },
+// ),
+
+// ExpectedAmount(
+//   controller: expectedAmountController,
+//   total: state.qrData.total,
+//   onChanged: (value) {  // Add this callback
+//     state.qrData.expectedAmount = value;
+//     BlocProvider.of<QrResultBloc>(context).add(
+//       QrResultExpectedAmountChangedEvent(qrData: state.qrData),
+//     );
+//   },
+//   onDiscountCalculated: (discount) {
+//     setState(() {
+//       state.qrData.expectedAmountDiscount = discount;
+//     });
+//   }, 
+//   onExpectedAmountEntered: (expected) {
+//     state.qrData.expectedAmount = expected.toString();
+//     BlocProvider.of<QrResultBloc>(context).add(
+//       QrResultExpectedAmountChangedEvent(qrData: state.qrData),
+//     );
+//   },
+// ),
+
+
+// void _updateControllersFromQrData(QrDataModel qr) {
+  //   // Update controllers from the provided qr data
+  //   itemController.text = qr.item;
+  //   grossWeightController.text = qr.grossWeight;
+  //   netWeightController.text = qr.netWeight;
+  //   rateController.text = qr.rate;
+  //   jyalaController.text = qr.jyala;
+  //   jartiPercentageController.text = qr.jartiPercentage;
+  //   jartiGramController.text = qr.jarti;
+  //   jartiLalController.text = qr.jartiLal;
+  //   jyalaPercentageController.text = qr.jyalaPercentage;
+  //   stone1NameController.text = qr.stone1Name;
+  //   stone2NameController.text = qr.stone2Name;
+  //   stone3NameController.text = qr.stone3Name;
+  //   stone1WeightController.text = qr.stone1Weight;
+  //   stone2WeightController.text = qr.stone2Weight;
+  //   stone3WeightController.text = qr.stone3Weight;
+  //   stone1PriceController.text = qr.stone1Price;
+  //   stone2PriceController.text = qr.stone2Price;
+  //   stone3PriceController.text = qr.stone3Price;
+  //   expectedAmountController.text = qr.expectedAmount;
+  // }
+
+  // builder: (context, state) {  //builder up
+        //   //if (state is  QrResultInitialState || state is QrResultExpectedAmountDiscountChangedState) {
+        //   if (state is QrResultInitialState) {
+        //     originalQrData = state.originalQrData;
+
+        //     itemController.text = state.qrData.item;
+        //     grossWeightController.text = state.qrData.grossWeight;
+        //     netWeightController.text = state.qrData.netWeight;
+        //     rateController.text = state.qrData.rate;
+        //     jyalaController.text = state.qrData.jyala;
+        //     jartiPercentageController.text = state.qrData.jartiPercentage;
+        //     jartiGramController.text = state.qrData.jarti;
+        //     jartiLalController.text = state.qrData.jartiLal;
+        //     jyalaPercentageController.text = state.qrData.jyalaPercentage;
+        //     stone1NameController.text = state.qrData.stone1Name;
+        //     stone2NameController.text = state.qrData.stone2Name;
+        //     stone3NameController.text = state.qrData.stone3Name;
+        //     stone1WeightController.text = state.qrData.stone1Weight;
+        //     stone2WeightController.text = state.qrData.stone2Weight;
+        //     stone3WeightController.text = state.qrData.stone3Weight;
+        //     stone1PriceController.text = state.qrData.stone1Price;
+        //     stone2PriceController.text = state.qrData.stone2Price;
+        //     stone3PriceController.text = state.qrData.stone3Price;
+        //     expectedAmountController.text = state.qrData.expectedAmount;
+
+        //         }
+            // else if (state is QrResultExpectedAmountDiscountChangedState) {// Update controllers with the new qrData values after expected amount discount change
+            //           jyalaController.text = state.qrData.jyala;
+            //       jartiPercentageController.text = state.qrData.jartiPercentage;
+            //       jartiGramController.text = state.qrData.jarti;
+            //       jartiLalController.text = state.qrData.jartiLal;
+            //       jyalaPercentageController.text = state.qrData.jyalaPercentage;
+            //       stone1PriceController.text = state.qrData.stone1Price;
+            //       stone2PriceController.text = state.qrData.stone2Price;
+            //       stone3PriceController.text = state.qrData.stone3Price;
+            //       }
+
+            //       } else if (state is QrResultExpectedAmountDiscountChangedState) {
+            //   // Update controllers with the new qrData values after expected amount change
+            //   itemController.text = state.qrData.item;
+            //   grossWeightController.text = state.qrData.grossWeight;
+            //   netWeightController.text = state.qrData.netWeight;
+            //   rateController.text = state.qrData.rate;
+            //   jyalaController.text = state.qrData.jyala;
+            //   jartiPercentageController.text = state.qrData.jartiPercentage;
+            //   jartiGramController.text = state.qrData.jarti;
+            //   jartiLalController.text = state.qrData.jartiLal;
+            //   jyalaPercentageController.text = state.qrData.jyalaPercentage;
+            //   stone1NameController.text = state.qrData.stone1Name;
+            //   stone2NameController.text = state.qrData.stone2Name;
+            //   stone3NameController.text = state.qrData.stone3Name;
+            //   stone1WeightController.text = state.qrData.stone1Weight;
+            //   stone2WeightController.text = state.qrData.stone2Weight;
+            //   stone3WeightController.text = state.qrData.stone3Weight;
+            //   stone1PriceController.text = state.qrData.stone1Price;
+            //   stone2PriceController.text = state.qrData.stone2Price;
+            //   stone3PriceController.text = state.qrData.stone3Price;
+            //   expectedAmountController.text = state.qrData.expectedAmount;
+            //   // Add any other updates if needed
+            // }
+
+            // Update controllers when bloc emits price/expected changes so textfields show new values
+            //   if (state is QrResultPriceChangedState ||
+            //       state is QrResultInitialState ||
+            //       state is QrResultExpectedAmountChangedState ||
+            //       state is QrResultExpectedAmountDiscountChangedState) {
+            //     // All these states contain an updated qrData object
+            //     final qr = state.qrData;
+            //     _updateControllersFromQrData(qr);
+            //   }
+            // },
+
+            // // Rebuild the main UI for initial load and for price/expected-related state changes.
+            //   buildWhen: (previous, current) =>
+            //       current is QrResultInitialState ||
+            //       current is QrResultPriceChangedState ||
+            //       current is QrResultExpectedAmountChangedState ||
+            //       current is QrResultExpectedAmountDiscountChangedState,
+
+            //   builder: (context, state) {
+            //     if (state is QrResultInitialState ||
+            //         state is QrResultPriceChangedState ||
+            //         state is QrResultExpectedAmountChangedState ||
+            //         state is QrResultExpectedAmountDiscountChangedState) {
+            //       // normalize to one state variable that contains qrData for building UI
+            //       final currentState = state;
+            //       final qrData = currentState.qrData;
+
+            //       // store original only when initial state arrives
+            //       if (state is QrResultInitialState) {
+            //         originalQrData = state.originalQrData;
+            //       }
+
+            //       // ensure controllers reflect current qrData (safe to call; listener already updates too)
+            //       _updateControllersFromQrData(qrData);

@@ -124,7 +124,7 @@ class _TabbarViewPageState extends State<TabbarViewPage>
     }
     setState(() {});
     tabController.addListener(() {
-      if (tabController.index == 2) {
+      if (tabController.index == 2 ) {
         onQrPressed(context);
         tabController.index = tabController.previousIndex;
         return;
@@ -174,7 +174,24 @@ class _TabbarViewPageState extends State<TabbarViewPage>
                 luxuryAmount: 0,
                 total: 0,
                 expectedAmount: "",
-                expectedAmountDiscount: 0.0,
+                expectedAmountDiscount: "",
+                //discount: 0.0,
+
+                 //jartiAmount: "",
+                // netWeightAmount: "",
+                // stoneTotalPrice: "",
+
+                newJyala: "0", //
+                newJyalaPercentage: "0", //
+                newJarti: "0", //
+                newJartiPercentage: "0", //
+                newJartiLal: "0", //
+                newJartiAmount: "0",
+                newStone1Price: "0",
+                newStone2Price: "0",
+                newStone3Price: "0",
+                newStoneTotalPrice: "0",
+
               ),
             ));
           }

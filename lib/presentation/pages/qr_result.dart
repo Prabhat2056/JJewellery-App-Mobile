@@ -11,14 +11,13 @@ import 'package:jjewellery/presentation/pages/bill_page.dart';
 import 'package:jjewellery/presentation/pages/login_page.dart';
 import 'package:jjewellery/presentation/pages/luxury.dart';
 
-
 import 'package:jjewellery/presentation/widgets/Global/custom_toast.dart';
 import 'package:jjewellery/presentation/widgets/Global/refresh_indicator.dart';
 import 'package:jjewellery/presentation/widgets/QrResult/expected_amount.dart';
 
+
 import 'package:jjewellery/presentation/widgets/QrResult/qr_result_header.dart';
 import 'package:jjewellery/presentation/widgets/QrResult/qr_result_stone_table.dart';
-
 
 import 'package:jjewellery/presentation/widgets/QrResult/row_with_textfield.dart';
 import 'package:jjewellery/presentation/widgets/QrResult/show_item_picker.dart';
@@ -42,13 +41,12 @@ class QrResult extends StatefulWidget {
 
   @override
   State<QrResult> createState() => _QrResultState();
-  
 }
 
 class _QrResultState extends State<QrResult> {
   late bool showCalculation;
   late QrDataModel originalQrDataModel;
-  
+   bool lockedToCalculatedJyala = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -74,11 +72,37 @@ class _QrResultState extends State<QrResult> {
   TextEditingController stone2PriceController = TextEditingController();
   TextEditingController stone3PriceController = TextEditingController();
   TextEditingController expectedAmountController = TextEditingController();
+ 
+
+  TextEditingController newjartiPercentageController = TextEditingController();
+  TextEditingController newjartiGramController = TextEditingController();
+  TextEditingController newjartiLalController = TextEditingController();
+  TextEditingController newjartiAmountController = TextEditingController();
+  TextEditingController newjyalaController = TextEditingController();
+  TextEditingController newjyalaPercentageController = TextEditingController();
+  TextEditingController newstone1PriceController = TextEditingController();
+  TextEditingController newstone2PriceController = TextEditingController();
+  TextEditingController newstone3PriceController = TextEditingController();
+
+
   late QrDataModel originalQrData;
   @override
   void initState() {
     super.initState();
     showCalculation = prefs.getBool("ShowCalculation") ?? true;
+
+
+
+  }
+
+   // 🔵 UPDATE JYALA CONTROLLER BASED ON newJyala OR jyala
+  void updateJyalaController(QrDataModel data) {
+    // ignore: unnecessary_null_comparison
+    final displayValue = (data.newJyala != null && data.newJyala.isNotEmpty)
+        ? data.newJyala
+        : data.jyala;
+
+    jyalaController.text = displayValue;
   }
 
   int findValidId(
@@ -120,13 +144,22 @@ class _QrResultState extends State<QrResult> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width * 0.18;
 
     return BlocConsumer<QrResultBloc, QrResultState>(
         listener: (context, state) {
-          if (state is QrResultPriceChangedState) {
+          //when price, expected amount discount changes, update controllers
+          if ( state is QrResultPriceChangedState||
+              state is QrResultExpectedAmountDiscountChangedState ||
+              state is QrResultTotalChangedState
+              || state is QrResultInitialState || state is QrResultJyalaChangedEvent|| state is QrResultJyalaPercentageChangedEvent
+
+              ) {
+                print("🟢 Updating controllers - jyala: ${state.qrData.jyala}, jyalaPercentage: ${state.qrData.jyalaPercentage}");
             jartiPercentageController.text = state.qrData.jartiPercentage;
             jartiGramController.text = state.qrData.jarti;
             jartiLalController.text = state.qrData.jartiLal;
@@ -134,21 +167,64 @@ class _QrResultState extends State<QrResult> {
             jyalaController.text = state.qrData.jyala;
             rateController.text = state.qrData.rate;
             itemController.text = state.qrData.item;
+
+             // For jyala fields: Show discount-calculated values OR manual values
+    if (state is QrResultExpectedAmountDiscountChangedState) {
+      // When discount is calculated, show new calculated values
+      jyalaPercentageController.text = state.qrData.newJyalaPercentage.isNotEmpty 
+          ? state.qrData.newJyalaPercentage 
+          : state.qrData.jyalaPercentage;
+      jyalaController.text = state.qrData.newJyala.isNotEmpty 
+          ? state.qrData.newJyala 
+          : state.qrData.jyala;
+    } else {
+      // For manual edits, show the original fields
+      jyalaPercentageController.text = state.qrData.jyalaPercentage;
+      jyalaController.text = state.qrData.jyala;
+    }
+
           }
         },
-        buildWhen: (previous, current) => current is QrResultInitialState,
-        builder: (context, state) {
+
+        
+      buildWhen: (previous,
+                current) => //updates UI when changes in these states occur
+            current is QrResultInitialState ||
+            current is QrResultExpectedAmountChangedState||
+            current is QrResultExpectedAmountDiscountChangedState || 
+            current is QrResultJyalaChangedEvent|| 
+            current is QrResultJyalaPercentageChangedEvent||
+            current is QrResultTotalChangedState,
+            //current is QrResultResetToOriginalState,
+      builder: (context, state) {
           if (state is QrResultInitialState) {
             originalQrData = state.originalQrData;
+
+            //}
+            // Update controllers for both initial and discount changed states
             itemController.text = state.qrData.item;
             grossWeightController.text = state.qrData.grossWeight;
             netWeightController.text = state.qrData.netWeight;
             rateController.text = state.qrData.rate;
-            jyalaController.text = state.qrData.jyala;
+            //jyalaController.text = state.qrData.jyala;
+
+            // 🔴 CRITICAL FIX: Update jyalaController based on newJyala
+    final displayJyala = (state.qrData.newJyala.isNotEmpty && 
+                         state.qrData.newJyala != "0.000")
+        ? state.qrData.newJyala
+        : state.qrData.jyala; 
+    jyalaController.text = displayJyala;
+
+    final displayJyalaPercentage = (state.qrData.newJyalaPercentage.isNotEmpty && 
+                         state.qrData.newJyalaPercentage != "0.000")
+        ? state.qrData.newJyalaPercentage
+        : state.qrData.jyalaPercentage;
+    jyalaPercentageController.text = displayJyalaPercentage;
+
             jartiPercentageController.text = state.qrData.jartiPercentage;
             jartiGramController.text = state.qrData.jarti;
             jartiLalController.text = state.qrData.jartiLal;
-            jyalaPercentageController.text = state.qrData.jyalaPercentage;
+            //jyalaPercentageController.text = state.qrData.jyalaPercentage;
             stone1NameController.text = state.qrData.stone1Name;
             stone2NameController.text = state.qrData.stone2Name;
             stone3NameController.text = state.qrData.stone3Name;
@@ -159,55 +235,31 @@ class _QrResultState extends State<QrResult> {
             stone2PriceController.text = state.qrData.stone2Price;
             stone3PriceController.text = state.qrData.stone3Price;
             expectedAmountController.text = state.qrData.expectedAmount;
+//  if (state is QrResultExpectedAmountDiscountChangedState) {
+//    // 🔴 CRITICAL FIX: Update jyalaController when discount is calculated
+//     final displayJyala = (state.qrData.newJyala.isNotEmpty && 
+//                          state.qrData.newJyala != "0.000")
+//         ? state.qrData.newJyala
+//         : state.qrData.jyala;
+//     jyalaController.text = displayJyala;
 
-// return BlocConsumer<QrResultBloc, QrResultState>(
-//   listener: (context, state) {
-//     if (state is QrResultPriceChangedState ||
-//         state is QrResultExpectedAmountDiscountChangedState) {
-      
-//       final qr = state.qrData;
-
-//       jartiPercentageController.text = qr.jartiPercentage;
-//       jartiGramController.text = qr.jarti;
-//       jartiLalController.text = qr.jartiLal;
-//       jyalaPercentageController.text = qr.jyalaPercentage;
-//       jyalaController.text = qr.jyala;
-//       rateController.text = qr.rate;
-//       itemController.text = qr.item;
-//       expectedAmountController.text = qr.expectedAmount;
-//     }
-//   },
-
-//   // 🔥 FIXED: UI now rebuilds on all relevant states
-//   buildWhen: (previous, current) =>
-//       current is QrResultInitialState ||
-//       current is QrResultPriceChangedState ||
-//       current is QrResultExpectedAmountDiscountChangedState,
-
-//   builder: (context, state) {
-//     if (state is QrResultInitialState) {
-//       final qr = state.qrData;
-
-//       itemController.text = qr.item;
-//       grossWeightController.text = qr.grossWeight;
-//       netWeightController.text = qr.netWeight;
-//       rateController.text = qr.rate;
-//       jyalaController.text = qr.jyala;
-//       jartiPercentageController.text = qr.jartiPercentage;
-//       jartiGramController.text = qr.jarti;
-//       jartiLalController.text = qr.jartiLal;
-//       jyalaPercentageController.text = qr.jyalaPercentage;
-//       expectedAmountController.text = qr.expectedAmount;
-
-//       // plus stones etc...
-//     }
-
-    
-  
-
-
-       
+//     final displayJyalaPercentage = (state.qrData.newJyalaPercentage.isNotEmpty && 
+//                          state.qrData.newJyalaPercentage != "0.000")
+//         ? state.qrData.newJyalaPercentage
+//         : state.qrData.jyalaPercentage;
+//     jyalaPercentageController.text = displayJyalaPercentage;
+//             //Initialize new calculated fields controllers with values for UI display
+//             // newjyalaController.text= state.qrData.newJyala ;
+//             // newjyalaPercentageController.text= state.qrData.newJyalaPercentage;
+//             // newjartiGramController.text= state.qrData.newJarti;
+//             // newjartiPercentageController.text = state.qrData.newJartiPercentage;
+//             // newjartiLalController.text= state.qrData.newJartiLal;
+//             // newstone1PriceController.text= state.qrData.newStone1Price;
+//             // newstone2PriceController.text= state.qrData.newStone2Price;
+//             // newstone3PriceController.text= state.qrData.newStone3Price;
+//  }
             
+
             return GestureDetector(
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               child: Scaffold(
@@ -426,7 +478,13 @@ class _QrResultState extends State<QrResult> {
                                                 jyalaPercentageController,
                                             controller2: jyalaController,
                                             onChanged1: (value) {
-                                              state.qrData.jyalaPercentage =
+                                               print("🟢 Manual jyalaPercentage change: $value");
+                                                // When user manually edits percentage, clear discount calculations
+    state.qrData.newJyala = "";
+    state.qrData.newJyalaPercentage = "";
+
+                                              if (state.qrData.newJyalaPercentage.isEmpty || state.qrData.newJyalaPercentage == "0.000") {
+                                                state.qrData.jyalaPercentage =
                                                   value;
                                               BlocProvider.of<QrResultBloc>(
                                                       context)
@@ -434,15 +492,32 @@ class _QrResultState extends State<QrResult> {
                                                       QrResultJyalaPercentageChangedEvent(
                                                           qrData:
                                                               state.qrData));
+
+                                              } 
                                             },
                                             onChanged2: (value) {
-                                              state.qrData.jyala = value;
-                                              BlocProvider.of<QrResultBloc>(
-                                                      context)
-                                                  .add(
-                                                      QrResultJyalaChangedEvent(
-                                                          qrData:
-                                                              state.qrData));
+                                               
+                                              
+                                              // state.qrData.jyala = value;
+                                              // BlocProvider.of<QrResultBloc>(
+                                              //         context)
+                                              //     .add(
+                                              //         QrResultJyalaChangedEvent(
+                                              //             qrData:
+                                              //                 state.qrData));
+                                              // Only update if we're not showing newJyala (user manually editing)
+
+                                              print("🟢 Manual jyala change: $value");
+                                              // Clear any calculated newJyala values when user manually edits
+    state.qrData.newJyala = "";
+    state.qrData.newJyalaPercentage = "";
+                  
+                                              if (state.qrData.newJyala.isEmpty || state.qrData.newJyala == "0.000") {
+                                                state.qrData.jyala = value;
+                                              
+                                                BlocProvider.of<QrResultBloc>(context)
+                                                  .add(QrResultJyalaChangedEvent(qrData: state.qrData));
+                                              }
                                             },
                                             title: "Jyala",
                                             unit1: "%",
@@ -515,39 +590,73 @@ class _QrResultState extends State<QrResult> {
                                 ),
                               ]),
                             ),
-
                             const Divider(),
+//                             ExpectedAmount(
+//                               controller: TextEditingController(text: state.qrData.expectedAmount),
+//   total: state.qrData.total,
+//   qrData: state.qrData,
+//   onDiscountCalculated: (discount) {
+//     // This will trigger the bloc event and calculations
+//     state.qrData.expectedAmountDiscount = discount.toStringAsFixed(2);
+//   },
+//   onExpectedAmountEntered: (expected) {
+//     state.qrData.expectedAmount = expected.toString();
+//     BlocProvider.of<QrResultBloc>(context).add(
+//       QrResultExpectedAmountChangedEvent(
+//         state.qrData.expectedAmount, 
+//         qrData: state.qrData
+//       ),
+//     );
+//   }, 
+// ),
+
+
                             ExpectedAmount(
-                              controller: expectedAmountController,
+                             // controller: expectedAmountController,
+                             controller:TextEditingController(
+                                text: state.qrData.expectedAmount),
                               total: state.qrData.total,
-                              // onExpectedAmountEntered: (expected) {
-                              //   setState(() {
-                              //     state.qrData.total = expected;   // ⭐ Replace total everywhere
-                                  
-                              //   });
-                              //   },
+                              qrData: state.qrData, // Pass the qrData object
                               onDiscountCalculated: (discount) {
                                 setState(() {
-                                  state.qrData.expectedAmountDiscount = discount;  // ⭐ Store saved discount
+                                  state.qrData.expectedAmountDiscount =
+                                      (discount).toStringAsFixed(2); // ⭐ Store saved discount
                                 });
-                              }, 
-                              onExpectedAmountEntered: (expected) {
-                               state.qrData.expectedAmount = expected.toString();
-                                BlocProvider.of<QrResultBloc>(context).add(
-                                  QrResultExpectedAmountChangedEvent(qrData: state.qrData),
-                                );
                               },
-                              
+                              onExpectedAmountEntered: (expected) {
+                                state.qrData.expectedAmount =
+                                    expected.toString();
+                                BlocProvider.of<QrResultBloc>(context).add(
+                                  QrResultExpectedAmountChangedEvent( state.qrData.expectedAmount, qrData: state.qrData),
+                                 // QrResultExpectedAmountChangedEvent(
+                                      //state.qrData as String, qrData: state.qrData),
+                                );
+                              }, 
                             ),
 
+                            //  ExpectedAmountPage(
+                            //   controller: expectedAmountController,
+                            //   //total: state.qrData.total,
+                            //   qrData: state.qrData, // Pass the qrData object
+
+                            //   onExpectedAmountEntered: (expected) {
+                            //     state.qrData.expectedAmount =
+                            //         expected.toString();
+                            //     BlocProvider.of<QrResultBloc>(context).add(
+                            //       //QrResultExpectedAmountChangedEvent( state.qrData.expectedAmount, qrData: state.qrData),
+                            //       QrResultExpectedAmountChangedEvent(
+                            //           state.qrData as String, qrData: state.qrData),
+                            //     );
+                            //   }, discount: state.qrData.expectedAmountDiscount,
+                            // ),
 
 
-
+                            
                             const Divider(),
                             BlocBuilder<QrResultBloc, QrResultState>(
                               buildWhen: (previous, current) =>
                                   current is QrResultPriceChangedState ||
-                                  current is QrResultInitialState, 
+                                  current is QrResultInitialState,
                               builder: (context, state) {
                                 if (state is QrResultPriceChangedState) {
                                   final qr = state.qrData;
@@ -563,7 +672,6 @@ class _QrResultState extends State<QrResult> {
                                 } else if (state is QrResultInitialState) {
                                   final qr = state.qrData;
 
-                                
                                   return LuxuryCalculationPage(
                                     baseAmount: qr.baseAmount,
                                     nonTaxableAmount: qr.nonTaxableAmount,
@@ -578,9 +686,6 @@ class _QrResultState extends State<QrResult> {
                                 }
                               },
                             ),
-
-
-
                             const Divider(),
                             const SizedBox(
                               height: 4,
@@ -720,7 +825,6 @@ class _QrResultState extends State<QrResult> {
                                 : DiscountSummaryWidget(
                                     qrData: state.qrData,
                                     originalQrData: originalQrData,
-                                    
                                   ),
                             const SizedBox(height: 25),
                           ],
@@ -874,16 +978,13 @@ class _QrResultState extends State<QrResult> {
                 ),
               ),
             );
-          } else {
+          } //if
+          else {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-        }
-      );
-  }
-}
-
-
-
-
+      }//builder
+    );
+  }//build
+}//_ QrResultState

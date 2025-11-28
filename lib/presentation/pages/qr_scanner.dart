@@ -106,6 +106,7 @@ class _QrScannerState extends State<QrScanner> {
 
       // print(values);
       qrData = QrDataModel(
+        
         id: "",
         code: dataParts[0],
         item: values[1],
@@ -146,7 +147,24 @@ class _QrScannerState extends State<QrScanner> {
         luxuryAmount: 0,
         total: 0,
         expectedAmount: "",
-        expectedAmountDiscount: 0.0,
+        expectedAmountDiscount: "",
+        //discount: 0.0,
+
+         //jartiAmount: values[18],
+        // netWeightAmount: values[19],
+        // stoneTotalPrice: values[20],
+
+        newJyala: values[7],
+        newJyalaPercentage: "",
+        newJarti: "",
+        newJartiPercentage: "",
+        newJartiLal: "",
+        newJartiAmount: "",
+        newStone1Price: values[10],
+        newStone2Price: values[13],
+        newStone3Price: values[16], 
+        newStoneTotalPrice: '',
+
       );
     } catch (e) {
       falseQr = true;

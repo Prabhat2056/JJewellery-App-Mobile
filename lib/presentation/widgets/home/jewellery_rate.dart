@@ -407,7 +407,7 @@ class _JewelleryRateState extends State<JewelleryRate> {
               )
             : Column(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 48, // Fixed height container
                     child: Center(
                       child: !widget.isRefreshing
