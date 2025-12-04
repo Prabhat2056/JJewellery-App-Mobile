@@ -175,9 +175,9 @@ class _TabbarViewPageState extends State<TabbarViewPage>
                 total: 0,
                 expectedAmount: "",
                 expectedAmountDiscount: "",
-                //discount: 0.0,
+                discount: "",
 
-                 //jartiAmount: "",
+                 jartiAmount: "",
                 // netWeightAmount: "",
                 // stoneTotalPrice: "",
 

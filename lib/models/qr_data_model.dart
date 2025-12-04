@@ -36,7 +36,7 @@ double taxableAmount;
 double luxuryAmount;
 double total; // total
 String expectedAmount = "";
-//double discount = 0.0;//
+String discount = "";//
 String expectedAmountDiscount = ""; // ⭐ NEW FIELD
 
 // String netWeightAmount ="";
@@ -95,11 +95,11 @@ String newStoneTotalPrice;
     required this.luxuryAmount ,
     required this.total ,
     required this.expectedAmount ,
-    //required this.discount ,
+    required this.discount ,
     required this.expectedAmountDiscount ,
 
     // required this.netWeightAmount,
-     //required this.jartiAmount,
+    required this.jartiAmount,
     // required this.stoneTotalPrice,
 
     required this.newJyala,//
@@ -135,8 +135,9 @@ String newStoneTotalPrice;
         'taxableAmount': taxableAmount.toStringAsFixed(2),
         'totalAmount': total.toStringAsFixed(2),
         'expectedAmount': expectedAmount.replaceAll(',', '').trim(),
-          //'discount': discount.toStringAsFixed(2),//
+        'discount': discount,//
         'expectedAmountDiscount': expectedAmountDiscount,
+        'jartiAmount': jartiAmount,
 
          //'jartiAmount': jartiAmount.replaceAll(',', '').trim(),
         // 'netWeightAmount': netWeightAmount.replaceAll(',', '').trim(),
@@ -234,11 +235,11 @@ String newStoneTotalPrice;
     double? luxuryAmount,
     double? total,
     String? expectedAmount,
-    //String? discount,
+    String? discount,
     String? expectedAmountDiscount,
 
     // String? netWeightAmount,
-     //String? jartiAmount,
+     String? jartiAmount,
     // String? stoneTotalPrice,
 
     String? newJyala,//
@@ -294,12 +295,13 @@ String newStoneTotalPrice;
       luxuryAmount: luxuryAmount ?? this.luxuryAmount,
       total: total ?? this.total,
       //discount: discount != null ? double.parse(discount) : this.discount,
+      discount: discount ?? this.discount,//
       expectedAmount: expectedAmount ?? this.expectedAmount,
       
       expectedAmountDiscount: expectedAmountDiscount ?? this.expectedAmountDiscount,
       //expectedAmountDiscount: expectedAmountDiscount != null ? double.parse(expectedAmountDiscount) : this.expectedAmountDiscount,
 
-       //jartiAmount: jartiAmount ?? this.jartiAmount,
+       jartiAmount: jartiAmount ?? this.jartiAmount,
       // netWeightAmount: netWeightAmount ?? this.netWeightAmount,
       // stoneTotalPrice: stoneTotalPrice ?? this.stoneTotalPrice,
 

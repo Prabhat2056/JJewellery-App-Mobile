@@ -10,4 +10,6 @@ class ColorConstant {
   static Color scaffoldColor = const Color.fromARGB(255, 230, 233, 235);
   static Color focusColor = const Color.fromARGB(255, 169, 112, 172);
   static Color errorColor = const Color.fromARGB(255, 187, 66, 57);
+
+  static var warningColor = Colors.orange[700];
 }

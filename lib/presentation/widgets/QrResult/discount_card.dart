@@ -27,9 +27,31 @@ class _DiscountSummaryWidgetState extends State<DiscountSummaryWidget> {
     return double.tryParse(sanitized) ?? 0.0;
   }
 
+  double _calculateJartiAmount(String jarti, String rate) {
+  if (jarti.isEmpty || jarti == "0") return 0.0;
+  double jartiValue = double.tryParse(jarti.replaceAll('K', '')) ?? 0.0;
+  double rateValue = double.tryParse(rate.replaceAll(',', '')) ?? 0.0;
+  return jartiValue * (rateValue / 11.664);
+}
+
+// double _calculatestonePrice(String stonePrice) {
+
+// }
+
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width * 0.3;
+
+    double originalJartiAmount = _calculateJartiAmount(
+    widget.originalQrData.jarti, 
+    widget.originalQrData.rate
+  );
+  
+  double currentJartiAmount = _calculateJartiAmount(
+    widget.qrData.jarti, 
+    widget.qrData.rate
+  );
 
     // Calculate item discount
     double originalPrice = stringToDouble(widget.originalQrData.price);
@@ -104,17 +126,19 @@ class _DiscountSummaryWidgetState extends State<DiscountSummaryWidget> {
                 width: width,
               ),
               _buildDiscountRow(
-                t1: "Jarti",
+                t1: "Jarti(gm)",
                 t2: widget.originalQrData.jarti,
                 t3: widget.qrData.jarti,
                 width: width,
               ),
-              //  _buildDiscountRow(
-              //   t1: "JartiAmt",
-              //   t2: widget.originalQrData.jartiAmount,
-              //   t3: widget.qrData.jartiAmount,
-              //   width: width,
-              // ),
+               _buildDiscountRow(
+                t1: "       (Rs.)",
+                t2: "${originalJartiAmount.toStringAsFixed(2)}",
+                t3: "${currentJartiAmount.toStringAsFixed(2)}",
+                // t2: originalJartiAmount.toStringAsFixed(2),
+                // t3: currentJartiAmount.toStringAsFixed(2),
+                width: width,
+              ),
               
               _buildDiscountRow(
                 t1: "Jyala",
@@ -128,20 +152,30 @@ class _DiscountSummaryWidgetState extends State<DiscountSummaryWidget> {
               _buildDiscountRow(
                 t1: "Stone 1",
                 t2: widget.originalQrData.stone1Price,
-                t3: widget.qrData.stone1Price,
+                //t3: widget.qrData.stone1Price,
+                t3: (widget.qrData.newStone1Price.isNotEmpty && widget.qrData.newStone1Price != "0.00")
+                  ? widget.qrData.newStone1Price  // Show newStone1Price if calculated
+                  : widget.qrData.stone1Price,
                 
                 width: width,
               ),
               _buildDiscountRow(
                 t1: "Stone 2",
                 t2: widget.originalQrData.stone2Price,
-                t3: widget.qrData.stone2Price,
+                //t3: widget.qrData.stone2Price,
+                t3: (widget.qrData.newStone2Price.isNotEmpty && widget.qrData.newStone2Price != "0.00")
+                  ? widget.qrData.newStone2Price  // Show newStone2Price if calculated
+                  : widget.qrData.stone2Price,
                 width: width,
               ),
               _buildDiscountRow(
                 t1: "Stone 3",
                 t2: widget.originalQrData.stone3Price,
-                t3: widget.qrData.stone3Price,
+                //t3: widget.qrData.stone3Price,
+                
+                t3: (widget.qrData.newStone3Price.isNotEmpty && widget.qrData.newStone3Price != "0.00")
+                  ? widget.qrData.newStone3Price  // Show newStone3Price if calculated
+                  : widget.qrData.stone3Price,
                 width: width,
               ),
               const Divider(color: Color.fromARGB(255, 156, 69, 62)),

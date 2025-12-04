@@ -148,9 +148,9 @@ class _QrScannerState extends State<QrScanner> {
         total: 0,
         expectedAmount: "",
         expectedAmountDiscount: "",
-        //discount: 0.0,
+        discount: "",
 
-         //jartiAmount: values[18],
+         jartiAmount: "",
         // netWeightAmount: values[19],
         // stoneTotalPrice: values[20],
 
@@ -184,12 +184,14 @@ class _QrScannerState extends State<QrScanner> {
         qrData: qrData,
         isUpdate: false,
       ));
+       //await Future.delayed(const Duration(milliseconds: 500));//wait for dialog to close
       Navigator.pop(context);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => TabbarViewPage(isScanned: true)),
       );
+   
     } else {
       handleInvalidQr();
     }

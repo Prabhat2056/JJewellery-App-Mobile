@@ -1079,3 +1079,192 @@
   //double expectedAmountDiscount = stringToDouble(qrData.expectedAmountDiscount ?? "0.000");
   //double initialDiscount = expectedAmountDiscount;
   
+
+
+     // if (showDiscountText) ...[
+          //   const SizedBox(height: 8),
+
+
+          //   Text(
+          //     "Expected Amount: Rs ${widget.qrData.expectedAmount}",
+          //     style: const TextStyle(
+          //       fontSize: 14,
+          //       color: Colors.green,
+          //       fontWeight: FontWeight.w600,
+          //     ),
+          //   ),
+          //   const SizedBox(height: 8),
+            
+          //   // Always show discount and expected amount
+          //   Text(
+          //     "Discount: Rs ${discount.toStringAsFixed(2)}",
+          //     style: const TextStyle(
+          //       fontSize: 14,
+          //       color: Colors.green,
+          //       fontWeight: FontWeight.w600,
+          //     ),
+          //   ),
+
+          //   Text(
+          //       "Original Jyala: Rs ${jyala.toStringAsFixed(2)}",
+          //       style: const TextStyle(
+          //         fontSize: 14,
+          //         color: Colors.green,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+
+          //     Text(
+          //       "Original Jarti Amount: Rs ${jartiAmount.toStringAsFixed(2)}",
+          //       style: const TextStyle(
+          //         fontSize: 14,
+          //         color: Colors.green,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+
+          //    Text(
+          //         "Original Stone1Price :  ${stone1Price.toStringAsFixed(2)}",
+          //           style: const TextStyle(
+          //             fontSize: 14,
+          //             color: Colors.green,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //       ),
+
+
+            
+            
+            
+          //   const SizedBox(height: 8),
+            
+          //   // JYALA SECTION - Only show if jyala was recalculated
+          //   if (isJyalaRecalculated) ...[
+          //     const Text(
+          //       "--- Jyala Adjustment ---",
+          //       style: TextStyle(
+          //         fontSize: 12,
+          //         color: Colors.grey,
+          //         fontWeight: FontWeight.w500,
+          //       ),
+          //     ),
+              
+          //     Text(
+          //       "Jyala After Discount: Rs ${newJyala.toStringAsFixed(2)}",
+          //       style: const TextStyle(
+          //         fontSize: 14,
+          //         color: Colors.blue,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+          //     const SizedBox(height: 4),
+          //   ],
+            
+          //    // JARTI AMOUNT SECTION - Only show if jarti amount was recalculated
+          //  if (isJartiAmountRecalculated) ...[
+          //     const Text(
+          //       "--- Jarti Amount Adjustment ---",
+          //       style: TextStyle(
+          //         fontSize: 12,
+          //         color: Colors.grey,
+          //         fontWeight: FontWeight.w500,
+          //       ),
+          //     ),
+              
+
+          //       //if (widget.qrData.newJartiAmount.isNotEmpty && widget.qrData.newJartiAmount != "0.000")
+             
+          //     Text(
+          //       "Jarti Amount After Discount: Rs ${newJartiAmount.toStringAsFixed(2)}",
+          //       style: const TextStyle(
+          //         fontSize: 14,
+          //         color: Colors.blue,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+          //     const SizedBox(height: 4),
+          //   ],
+            
+          //   // JARTI GRAM SECTION - Only show if jarti gram was recalculated
+          //   if (isJartiRecalculated) ...[
+          //     const Text(
+          //       "--- Jarti Gram Adjustment ---",
+          //       style: TextStyle(
+          //         fontSize: 12,
+          //         color: Colors.grey,
+          //         fontWeight: FontWeight.w500,
+          //       ),
+          //     ),
+          //     // Try calculating original jarti amount from jarti and rate
+          //       Text(
+          //         "Original Jarti :  ${jarti.toStringAsFixed(2)}",
+          //           style: const TextStyle(
+          //             fontSize: 14,
+          //             color: Colors.green,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //       ),
+          //     Text(
+          //       "Jarti After Discount: ${newJarti.toStringAsFixed(2)}g",
+          //       style: const TextStyle(
+          //         fontSize: 14,
+          //         color: Colors.blue,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+          //     const SizedBox(height: 4),
+          //   ],
+            
+          //   // Show message if no fields were recalculated
+          //   // if (!isJyalaRecalculated && 
+          //   //     !isJartiAmountRecalculated && 
+          //   //     !isJartiRecalculated && 
+          //   //     //!isJartiLalRecalculated &&
+          //   //     discount > 0) ...[
+          //   if (isStone1PriceRecalculated) ...[
+          //     const Text(
+          //       "---  Stone Price Adjusted  ---",
+          //       style: TextStyle(
+          //         fontSize: 12,
+          //         color: Colors.grey,
+          //         fontStyle: FontStyle.italic,
+          //       ),
+          //     ),
+             
+          //     Text(
+          //       "Stone1Price After Discount: ${newStone1Price.toStringAsFixed(2)}",
+          //       style: const TextStyle(
+          //         fontSize: 14,
+          //         color: Colors.blue,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+          //   ],
+          // ],
+
+            // bool isJartiAmountRecalculated = _isFieldRecalculated(
+    //   widget.qrData.jartiAmount, 
+    //   widget.qrData.newJartiAmount
+    // );
+
+
+    // print("ExpectedAmount-jartiAmount calculated: $jartiAmount");
+    //  //double jartiAmount = _safeParse(widget.qrData.jartiAmount);
+    // double newJartiAmount = _safeParse(widget.qrData.newJartiAmount);
+    
+    // double newJarti = _safeParse(widget.qrData.newJarti);
+    // double jartiLal = _safeParse(widget.qrData.jartiLal);
+    // double newJartiLal = _safeParse(widget.qrData.newJartiLal);
+
+     //  double jartiAmount = ((jarti *rate)/11.664).toDouble();
+    //  print("ExpectedAmount-jartiAmount calculated: $jartiAmount");
+
+      // ✅ FIX: Calculate jartiAmount properly
+  // double jartiAmount;
+  // if (widget.qrData.jartiAmount.isNotEmpty && widget.qrData.jartiAmount != "0.000") {
+  //   // Use the value from qrData if available
+  //   jartiAmount = _safeParse(widget.qrData.jartiAmount);
+  // } else {
+  //   // Calculate from jarti and rate
+  //   jartiAmount = ((jarti * rate) / 11.664);
+  // }
